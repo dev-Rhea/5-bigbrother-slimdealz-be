@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/*
+/kakao/{kakao_Id}/bookmarks 까지 requestMapping에 합쳐서 정리해주셔도 됩니다.
+ */
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping(" /v1/users")
 @RequiredArgsConstructor
 public class BookmarkController {
 
@@ -30,6 +33,9 @@ public class BookmarkController {
         return ResponseEntity.ok(bookmarks);
     }
 
+    /*
+    RequestParam 에서 required는 기본적으로 true이기 때문에 생략해도 됩니다.
+     */
     @GetMapping("/kakao/{kakao_Id}/bookmarks/search")
     public ResponseEntity<Boolean> isProductBookmarked(
             @PathVariable String kakao_Id,

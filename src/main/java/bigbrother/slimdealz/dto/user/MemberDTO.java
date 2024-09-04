@@ -4,7 +4,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
+/*
+변수명은 camelCase로 작성해주세요
+ */
 @Data
 @ToString
 public class MemberDTO {
