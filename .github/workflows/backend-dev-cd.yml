@@ -57,7 +57,7 @@ jobs:
           tags: ${{ secrets.DEV_DOCKER_HUB_REPOSITORY }}:${{ secrets.DEV_IMAGE_TAG }}
 
   docker-pull-and-run:
-    runs-on: [ self-hosted, Linux, X64, prob ]
+    runs-on: [ self-hosted, Linux, X64, dev ]
     needs: [ docker-build-and-push ]
     if: ${{ needs.docker-build-and-push.result == 'success' }}
 
