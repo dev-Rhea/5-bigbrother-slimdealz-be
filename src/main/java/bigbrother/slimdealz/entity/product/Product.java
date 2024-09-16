@@ -31,6 +31,14 @@ public class Product extends BaseEntity {
     @Column(name = "vendor_url", nullable = false)
     private String vendorUrl;
 
+    @Setter
+    @Column(name = "view_count")
+    private int viewCount = 0;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Price> prices;
+
+    public void addViewCount() {
+        this.viewCount += 1;
+    }
 }

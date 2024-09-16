@@ -6,6 +6,8 @@ import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.service.ProductService;
 import bigbrother.slimdealz.service.S3Service;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -79,9 +81,9 @@ public class ProductController {
     }
 
     @GetMapping("/product-detail")
-    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName) {
+    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName, HttpServletRequest request, HttpServletResponse response) {
         try {
-            ProductDto productDto = productService.getProductWithLowestPriceByName(productName);
+            ProductDto productDto = productService.getProductWithLowestPriceByName(productName, request, response);
 
             String imageUrl = s3Service.getProductImageUrl(productName);
             productDto.setImageUrl(imageUrl);

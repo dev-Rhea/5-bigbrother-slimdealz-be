@@ -6,11 +6,15 @@ import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.repository.Product.ProductRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,11 +63,31 @@ public class ProductService {
 
     // 상품 상세 페이지 정보
     @Transactional
-    public ProductDto getProductWithLowestPriceByName(String productName) {
+    public ProductDto getProductWithLowestPriceByName(String productName, HttpServletRequest request, HttpServletResponse response) {
         Product product = productRepository.findProductWithLowestPriceByName(productName);
 
         if(product == null) {
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
+        }
+
+        Cookie[] cookies = request.getCookies();
+        Cookie oldCookie = findCookie(cookies, "view_count");
+
+        if(oldCookie != null) {
+            if(!oldCookie.getValue().contains(product.getName())) {
+                oldCookie.setValue(oldCookie.getValue() + product.getId());
+                oldCookie.setPath("/");
+                response.addCookie(oldCookie);
+                product.addViewCount();
+                productRepository.save(product);
+            }
+            else {
+                Cookie newCookie = new Cookie("view_count", product.getName());
+                newCookie.setPath("/");
+                response.addCookie(oldCookie);
+                product.addViewCount();
+                productRepository.save(product);
+            }
         }
 
         ProductDto productDto = ProductConverter.toProductDTO(product);
@@ -121,5 +145,28 @@ public class ProductService {
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
         }
         return products;
+    }
+
+    private Cookie findCookie(Cookie[] cookies, String name) {
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals(name)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Product getProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+    }
+
+    @Transactional
+    public void addViewCount(Long productId) {
+        Product product = getProductById(productId);
+        product.addViewCount();
+        productRepository.save(product);
     }
 }
