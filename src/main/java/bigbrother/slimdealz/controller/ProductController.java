@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -152,6 +153,27 @@ public class ProductController {
             log.error(e.getMessage());
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
         }
+    }
+
+    @GetMapping("/popular-products")
+    public List<ProductDto> findPopularProducts() {
+        try {
+            List<ProductDto> products = productService.getPopularProducts(LocalDateTime.now().minusHours(1));
+
+            products.forEach(product -> {
+                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                product.setImageUrl(imageUrl);
+            });
+
+            return products;
+        } catch (CustomException e) {
+            log.error(e.getDetailMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
+        }
+
     }
 
 }

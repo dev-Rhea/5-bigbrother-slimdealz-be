@@ -5,6 +5,7 @@ import bigbrother.slimdealz.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name = "products")
@@ -35,10 +36,17 @@ public class Product extends BaseEntity {
     @Column(name = "view_count")
     private int viewCount = 0;
 
+    @Column(name = "viewed_at", nullable = false)
+    private LocalDateTime viewedAt;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Price> prices;
 
     public void addViewCount() {
         this.viewCount += 1;
+    }
+
+    public ProductView(Product product) {
+        this.viewedAt= LocalDateTime.now();
     }
 }

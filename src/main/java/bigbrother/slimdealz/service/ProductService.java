@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -169,4 +169,40 @@ public class ProductService {
         product.addViewCount();
         productRepository.save(product);
     }
+
+    // 인기 급상승
+    public List<ProductDto> getPopularProducts(LocalDateTime localDateTime) {
+        List<ProductDto> popularProducts = productRepository.findPopularProducts();
+        List<ProductDto> adjustedPopularProducts = adjustScoreProducts(popularProducts);
+
+        // 조회수가 모두 0인 경우 가격 높은 순으로 반환
+        if(adjustedPopularProducts.isEmpty() || allViewCountZero(adjustedPopularProducts)){
+            productRepository.findPopularProducts();
+        }
+
+        return adjustedPopularProducts;
+    }
+
+    private boolean allViewCountZero(List<ProductDto> adjustedPopularProducts) {
+        return adjustedPopularProducts.stream().allMatch(products -> adjustedPopularProducts.getViewCount() == 0);
+    }
+
+    // 인기 급상승 점수 계산 로직
+    private List<ProductDto> adjustScoreProducts(List<ProductDto> popularProducts) {
+        List<ProductDto> previousPopularProducts = productRepository.findPopularProducts();
+
+        for(ProductDto p : popularProducts) {
+            boolean wasInPopular = previousPopularProducts.stream().anyMatch(orev -> prev.getId().equals(p.getId()));
+
+            if(wasInPopular) {
+                p.setScore(p.getScore() - 1);
+
+            }
+            else {
+                p.setScore(p.getScroe() + 1);
+            }
+        }
+        return popularProducts;
+    }
+
 }

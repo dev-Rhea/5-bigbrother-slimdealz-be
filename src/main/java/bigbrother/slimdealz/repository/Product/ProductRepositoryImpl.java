@@ -1,5 +1,7 @@
 package bigbrother.slimdealz.repository.Product;
 
+import bigbrother.slimdealz.dto.product.ProductConverter;
+import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.entity.product.QPrice;
 import bigbrother.slimdealz.entity.product.QProduct;
@@ -8,7 +10,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -173,4 +175,36 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         );
     }
 
+    @Override
+    public List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo) {
+        QProduct qProduct = QProduct.product;
+
+        List<Product> products = backToDayList(startOfDay, endOfDay, queryFactory ->
+                queryFactory.selectFrom(qProduct)
+                        .where(qProduct.viewCount.isNotNull())  // 조회수가 있는 제품만 선택
+                        .orderBy(qProduct.viewCount.desc())     // 조회수를 기준으로 내림차순 정렬
+                        .limit(10)                              // 상위 10개 제한
+                        .fetch()
+                );
+
+        return products.stream()
+                .map(ProductConverter::toProductDTO)    // Product -> ProductDto 변환
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductDto> findTopProductsByPrice() {
+        QProduct qProduct = QProduct.product;
+
+        List<Product> products = backToDayList(startOfDay, endOfDay, queryFactory ->
+                queryFactory.selectFrom(qProduct)
+                        .orderBy(qProduct.prices.isNotEmpty().desc())
+                        .limit(10)
+                        .fetch()
+                );
+
+        return products.stream()
+                .map(ProductConverter::toProductDTO)
+                .collect(Collectors.toList());
+    }
 }
