@@ -46,7 +46,7 @@ public class Product extends BaseEntity {
         this.viewCount += 1;
     }
 
-    public ProductView(Product product) {
+    public void ProductView(Product product) {
         this.viewedAt= LocalDateTime.now();
     }
 }

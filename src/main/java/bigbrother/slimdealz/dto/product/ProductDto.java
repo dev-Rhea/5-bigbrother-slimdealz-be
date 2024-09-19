@@ -20,6 +20,7 @@ public class ProductDto {
     private String vendorUrl;
     private String imageUrl;
     private int viewCount;
+    private int score;
     private List<PriceDto> prices;
 }
 
