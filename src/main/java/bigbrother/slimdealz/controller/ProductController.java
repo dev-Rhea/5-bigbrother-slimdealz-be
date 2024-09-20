@@ -88,13 +88,13 @@ public class ProductController {
                                                       HttpServletRequest request,
                                                       HttpServletResponse response) {
         try {
-            Cookie viewCountCookie = productService.addViewCount(productId);
-            response.addCookie(viewCountCookie);
-
             ProductDto productDto = productService.getProductWithLowestPriceByName(productName);
 
             String imageUrl = s3Service.getProductImageUrl(productName);
             productDto.setImageUrl(imageUrl);
+
+            Cookie viewCountCookie = productService.addViewCount(request, response, productId);
+            response.addCookie(viewCountCookie);
 
             return productDto;
 

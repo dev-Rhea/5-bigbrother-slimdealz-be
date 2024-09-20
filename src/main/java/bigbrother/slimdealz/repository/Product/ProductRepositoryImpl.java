@@ -6,6 +6,7 @@ import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.entity.product.QPrice;
 import bigbrother.slimdealz.entity.product.QProduct;
 import bigbrother.slimdealz.entity.product.QVendor;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -176,40 +177,32 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo) {
-        QProduct qProduct = QProduct.product;
-
-        List<Product> products = backToDayList(oneHourAgo, LocalDateTime.now(), queryFactory ->
-                queryFactory.select(new QProductDto(
-                        product.id,
-                        product.name,
-                        product.prices
-                        ))
-                        .from(product)
-                        .where(product.viewdAt.after(oneHourAgo))  // 조회수가 있는 제품만 선택
-                        .orderBy(product.viewCount.desc())     // 조회수를 기준으로 내림차순 정렬
-                        .limit(10)                              // 상위 10개 제한
-                        .fetch()
-                );
-
-        return products.stream()
-                .map(ProductConverter::toProductDTO)    // Product -> ProductDto 변환
-                .collect(Collectors.toList());
+    public List<Product> findPopularProducts(LocalDateTime oneHourAgo) {
+        return queryFactory
+                .selectFrom(product)
+                .where(product.viewCount.gt(0), product.updatedAt.after(oneHourAgo))
+                .orderBy(product.viewCount.desc())
+                .limit(10)
+                .fetch();
     }
 
     @Override
     public List<ProductDto> findTopProductsByPrice() {
         QProduct qProduct = QProduct.product;
 
-        List<Product> products = backToDayList(startOfDay, endOfDay, queryFactory ->
-                queryFactory.selectFrom(qProduct)
-                        .orderBy(qProduct.prices.isNotEmpty().desc())
-                        .limit(10)
-                        .fetch()
-                );
-
-        return products.stream()
-                .map(ProductConverter::toProductDTO)
-                .collect(Collectors.toList());
+        return queryFactory
+                .select(Projections.fields(
+                        ProductDto.class,
+                        qProduct.id.as("id"),
+                        qProduct.name.as("name"),
+                        qProduct.category.as("category"),
+                        qProduct.viewCount.as("viewCount"),
+                        qProduct.viewedAt.as("viewedAt"),
+                        qProduct.prices.any().setPrice.as("price")
+                ))
+                .from(qProduct)
+                .orderBy(qProduct.prices.any().setPrice.desc())
+                .limit(10)
+                .fetch();
     }
 }

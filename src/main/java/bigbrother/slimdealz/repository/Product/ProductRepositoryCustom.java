@@ -28,7 +28,6 @@ public interface ProductRepositoryCustom {
     List<Product> findRandomProducts();
 
     // 인기 급상승
-    List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo);
+    List<Product> findPopularProducts(LocalDateTime oneHourAgo);
     List<ProductDto> findTopProductsByPrice();
-
 }

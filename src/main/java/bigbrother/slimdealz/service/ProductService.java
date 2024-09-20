@@ -10,10 +10,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final S3Service s3Service;
+    private List<ProductDto> cachedPopularProducts = new ArrayList<>();
 
     // 상품 검색
     @Transactional
@@ -78,14 +82,14 @@ public class ProductService {
                 oldCookie.setValue(oldCookie.getValue() + product.getId());
                 oldCookie.setPath("/");
                 response.addCookie(oldCookie);
-                product.addViewCount();
+                product.incrementViewCount();
                 productRepository.save(product);
             }
             else {
                 Cookie newCookie = new Cookie("view_count", product.getName());
                 newCookie.setPath("/");
                 response.addCookie(oldCookie);
-                product.addViewCount();
+                product.incrementViewCount();
                 productRepository.save(product);
             }
         }
@@ -147,6 +151,32 @@ public class ProductService {
         return products;
     }
 
+    public Cookie addViewCount(HttpServletRequest request, Long productId) {
+        Product product = this.getProductById(productId);
+
+        // 기존 쿠키
+        Cookie[] cookies = request.getCookies();
+        Cookie oldCookie = this.findCookie(cookies, "view_count");
+
+        // 쿠키 있는 경우 조회수 처리
+        if(oldCookie != null) {
+            // 쿠키에 상품 Id가 없다면, 조회수 증가
+            if(!oldCookie.getValue().contains("[" + productId + "]")) {
+                oldCookie.setValue(oldCookie.getValue()+"[" + productId + "]");
+                oldCookie.setPath("/");
+                product.incrementViewCount();
+                productRepository.save(product);
+            }
+            return oldCookie;
+        }
+        else {
+            Cookie newCookie = new Cookie("view_count", productId);
+            product.incrementViewCount();
+            productRepository.save(product);
+            return newCookie;
+        }
+    }
+
     private Cookie findCookie(Cookie[] cookies, String name) {
         if (cookies != null) {
             for (Cookie c : cookies) {
@@ -165,44 +195,30 @@ public class ProductService {
 
     public Cookie addViewCount(Long productId) {
         Product product = getProductById(productId);
-        product.addViewCount();
+        product.incrementViewCount();
         productRepository.save(product);
         return null;
     }
 
-    // 인기 급상승
-    public List<ProductDto> getPopularProducts(LocalDateTime localDateTime) {
-        List<ProductDto> popularProducts = productRepository.findPopularProducts(localDateTime);
-        List<ProductDto> adjustedPopularProducts = adjustScoreProducts(popularProducts, localDateTime);
+    // 인기 급상승 상품 갱신
+    @Scheduled(cron = "0 0 * * * ?")
+    @Transactional
+    public void updatePopularProducts() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
 
-        // 조회수가 모두 0인 경우 가격 높은 순으로 반환
-        if(adjustedPopularProducts.isEmpty() || allViewCountZero(adjustedPopularProducts)){
-            productRepository.findPopularProducts(localDateTime);
+        List<Product> popularProducts = productRepository.findPopularProducts(oneHourAgo);
+
+        cachedPopularProducts = popularProducts.stream()
+                .map(ProductConverter::toProductDTO)
+                .collect(Collectors.toList());
+
+        // 점수 업데이트
+        for(Product p : popularProducts) {
+            int delta = cachedPopularProducts.contains(p) ? -1 : 1;
+            p.adjustScore(delta);
+            productRepository.save(p);
         }
-
-        return adjustedPopularProducts;
-    }
-
-    private boolean allViewCountZero(List<ProductDto> adjustedPopularProducts) {
-        return adjustedPopularProducts.stream().allMatch(products -> products.getViewCount() == 0);
-    }
-
-    // 인기 급상승 점수 계산 로직
-    private List<ProductDto> adjustScoreProducts(List<ProductDto> popularProducts, LocalDateTime previousTime) {
-        List<ProductDto> previousPopularProducts = productRepository.findPopularProducts(previousTime);
-
-        for(ProductDto p : popularProducts) {
-            boolean wasInPopular = previousPopularProducts.stream().anyMatch(prev -> prev.getId().equals(p.getId()));
-
-            if(wasInPopular) {
-                p.setScore(p.getScore() - 1);
-
-            }
-            else {
-                p.setScore(p.getScore() + 1);
-            }
-        }
-        return popularProducts;
+        System.out.println("인기 급상승 상품이 업데이트 되었습니다.");
     }
 
 }

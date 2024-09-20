@@ -39,14 +39,19 @@ public class Product extends BaseEntity {
     @Column(name = "viewed_at", nullable = false)
     private LocalDateTime viewedAt;
 
+    @Column(name = "score")
+    private int score;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Price> prices;
 
-    public void addViewCount() {
-        this.viewCount += 1;
+    // 조회수 추가
+    public void incrementViewCount() {
+        this.viewCount++;
     }
 
-    public void ProductView(Product product) {
-        this.viewedAt= LocalDateTime.now();
+    // 점수 추가
+    public void adjustScore(int delta) {
+        this.score += delta;
     }
 }
