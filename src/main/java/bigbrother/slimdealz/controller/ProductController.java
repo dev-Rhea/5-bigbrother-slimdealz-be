@@ -26,11 +26,12 @@ public class ProductController {
     @GetMapping("/search")
     public List<ProductDto> searchProducts(@RequestParam("keyword") String keyword,
                                            @RequestParam(value = "lastSeenId", required = false) Long lastSeenId,
+                                           @RequestParam(value = "lastSeenProductName", required = false) String lastSeenProductName,
                                            @RequestParam(value = "size", defaultValue = "10") int size) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CompletableFuture<List<ProductDto>> future = CompletableFuture.supplyAsync(() -> {
             try {
-                List<ProductDto> products = productService.searchProducts(keyword, lastSeenId, size);
+                List<ProductDto> products = productService.searchProducts(keyword, lastSeenId, lastSeenProductName ,size);
                 products.forEach(product -> {
                     String imageUrl = s3Service.getProductImageUrl(product.getName());
                     product.setImageUrl(imageUrl);
@@ -101,9 +102,10 @@ public class ProductController {
     @GetMapping("/products")
     public List<ProductDto> findByCategory(@RequestParam("category") String category,
                                            @RequestParam(value = "lastSeenId", required = false) Long lastSeenId,
+                                           @RequestParam(value = "lastSeenProductName", required = false) String lastSeenProductName,
                                            @RequestParam(value = "size", defaultValue = "10") int size) {
         try {
-            List<ProductDto> products = productService.findByCategory(category, lastSeenId, size);
+            List<ProductDto> products = productService.findByCategory(category, lastSeenId, lastSeenProductName, size);
 
             products.forEach(product -> {
                 String imageUrl = s3Service.getProductImageUrl(product.getName());

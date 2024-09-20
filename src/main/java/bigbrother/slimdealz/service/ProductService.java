@@ -28,8 +28,8 @@ public class ProductService {
 
     // 상품 검색
     @Transactional
-    public List<ProductDto> searchProducts(String keyword, Long lastSeenId, int size) {
-        List<ProductDto> products = productRepository.searchByKeyword(keyword, lastSeenId, size)
+    public List<ProductDto> searchProducts(String keyword, Long lastSeenId, String lastSeenProductName, int size) {
+        List<ProductDto> products = productRepository.searchByKeyword(keyword, lastSeenId, lastSeenProductName, size)
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
@@ -84,8 +84,8 @@ public class ProductService {
 
     // 카테고리 별 상품 조회
     @Transactional
-    public List<ProductDto> findByCategory(String category, Long lastSeenId, int size) {
-        List<ProductDto> products = productRepository.findByCategory(category, lastSeenId, size)
+    public List<ProductDto> findByCategory(String category, Long lastSeenId, String lastSeenProductName, int size) {
+        List<ProductDto> products = productRepository.findByCategory(category, lastSeenId, lastSeenProductName, size)
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);

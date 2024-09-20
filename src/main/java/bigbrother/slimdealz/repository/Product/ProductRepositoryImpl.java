@@ -54,7 +54,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     // 검색 결과 목록
     @Override
-    public List<Product> searchByKeyword(String keyword, Long lastSeenId, int size) {
+    public List<Product> searchByKeyword(String keyword, Long lastSeenId, String lastSeenProductName,int size) {
         QProduct productSub = new QProduct("productSub");
         QPrice priceSub = new QPrice("priceSub"); // Price 서브쿼리용 객체
 
@@ -64,7 +64,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         .where(
                                 product.name.containsIgnoreCase(keyword),
                                 lastSeenId != null ? product.id.gt(lastSeenId) : null,
-                                product.createdAt.between(startOfDay, endOfDay)
+                                product.createdAt.between(startOfDay, endOfDay),
+                                lastSeenProductName != null ? product.name.ne(lastSeenProductName) : null
                         )
                         .groupBy(product.name) // name을 기준으로 그룹화
                         .having(product.prices.any().setPrice.eq( // 최저가 조건 추가
@@ -112,7 +113,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     // 카테고리 목록
     @Override
-    public List<Product> findByCategory(String category, Long lastSeenId, int size) {
+    public List<Product> findByCategory(String category, Long lastSeenId, String lastSeenProductName, int size) {
         QProduct productSub = new QProduct("productSub");
         QPrice priceSub = new QPrice("priceSub");
 
@@ -124,6 +125,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.category.eq(category),
                                 lastSeenId != null ? product.id.gt(lastSeenId) : null,
                                 product.createdAt.between(startOfDay, endOfDay),
+                                lastSeenProductName != null ? product.name.ne(lastSeenProductName) : null,
                                 price.setPrice.eq(
                                         JPAExpressions.select(priceSub.setPrice.min())
                                                 .from(priceSub)
