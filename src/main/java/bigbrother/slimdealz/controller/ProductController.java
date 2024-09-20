@@ -6,6 +6,7 @@ import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.service.ProductService;
 import bigbrother.slimdealz.service.S3Service;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -82,9 +83,15 @@ public class ProductController {
     }
 
     @GetMapping("/product-detail")
-    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName, HttpServletRequest request, HttpServletResponse response) {
+    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName,
+                                                      @RequestParam("productId") Long productId,
+                                                      HttpServletRequest request,
+                                                      HttpServletResponse response) {
         try {
-            ProductDto productDto = productService.getProductWithLowestPriceByName(productName, request, response);
+            Cookie viewCountCookie = productService.addViewCount(productId);
+            response.addCookie(viewCountCookie);
+
+            ProductDto productDto = productService.getProductWithLowestPriceByName(productName);
 
             String imageUrl = s3Service.getProductImageUrl(productName);
             productDto.setImageUrl(imageUrl);

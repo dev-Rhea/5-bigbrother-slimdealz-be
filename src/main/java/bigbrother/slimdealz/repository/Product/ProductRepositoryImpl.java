@@ -179,10 +179,15 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     public List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo) {
         QProduct qProduct = QProduct.product;
 
-        List<Product> products = backToDayList(startOfDay, endOfDay, queryFactory ->
-                queryFactory.selectFrom(qProduct)
-                        .where(qProduct.viewCount.isNotNull())  // 조회수가 있는 제품만 선택
-                        .orderBy(qProduct.viewCount.desc())     // 조회수를 기준으로 내림차순 정렬
+        List<Product> products = backToDayList(oneHourAgo, LocalDateTime.now(), queryFactory ->
+                queryFactory.select(new QProductDto(
+                        product.id,
+                        product.name,
+                        product.prices
+                        ))
+                        .from(product)
+                        .where(product.viewdAt.after(oneHourAgo))  // 조회수가 있는 제품만 선택
+                        .orderBy(product.viewCount.desc())     // 조회수를 기준으로 내림차순 정렬
                         .limit(10)                              // 상위 10개 제한
                         .fetch()
                 );

@@ -163,17 +163,17 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
     }
 
-    @Transactional
-    public void addViewCount(Long productId) {
+    public Cookie addViewCount(Long productId) {
         Product product = getProductById(productId);
         product.addViewCount();
         productRepository.save(product);
+        return null;
     }
 
     // 인기 급상승
     public List<ProductDto> getPopularProducts(LocalDateTime localDateTime) {
         List<ProductDto> popularProducts = productRepository.findPopularProducts(localDateTime);
-        List<ProductDto> adjustedPopularProducts = adjustScoreProducts(popularProducts);
+        List<ProductDto> adjustedPopularProducts = adjustScoreProducts(popularProducts, localDateTime);
 
         // 조회수가 모두 0인 경우 가격 높은 순으로 반환
         if(adjustedPopularProducts.isEmpty() || allViewCountZero(adjustedPopularProducts)){
@@ -188,8 +188,8 @@ public class ProductService {
     }
 
     // 인기 급상승 점수 계산 로직
-    private List<ProductDto> adjustScoreProducts(List<ProductDto> popularProducts, LocalDateTime currentTime) {
-        List<ProductDto> previousPopularProducts = productRepository.findPopularProducts(currentTime);
+    private List<ProductDto> adjustScoreProducts(List<ProductDto> popularProducts, LocalDateTime previousTime) {
+        List<ProductDto> previousPopularProducts = productRepository.findPopularProducts(previousTime);
 
         for(ProductDto p : popularProducts) {
             boolean wasInPopular = previousPopularProducts.stream().anyMatch(prev -> prev.getId().equals(p.getId()));

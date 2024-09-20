@@ -14,6 +14,8 @@ public class ProductConverter {
                 .category(product.getCategory())
                 .shippingFee(product.getShippingFee())
                 .vendorUrl(product.getVendorUrl())
+                .viewCount(product.getViewCount())
+                .viewedAt(product.getViewedAt())
                 .prices(product.getPrices().stream()
                         .map(ProductConverter::toPriceDTO)
                         .collect(Collectors.toList()))
