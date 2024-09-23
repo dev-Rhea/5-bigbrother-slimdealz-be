@@ -1,5 +1,6 @@
 package bigbrother.slimdealz.controller;
 
+import bigbrother.slimdealz.dto.product.ChartDto;
 import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
