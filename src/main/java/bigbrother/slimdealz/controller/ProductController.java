@@ -2,11 +2,13 @@ package bigbrother.slimdealz.controller;
 
 import bigbrother.slimdealz.dto.product.ChartDto;
 import bigbrother.slimdealz.dto.product.ProductDto;
-import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.service.ProductService;
 import bigbrother.slimdealz.service.S3Service;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -80,9 +82,31 @@ public class ProductController {
     }
 
     @GetMapping("/product-detail")
-    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName) {
+    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName,
+                                                      @RequestParam("productId") Long productId,
+                                                      HttpServletRequest request,
+                                                      HttpServletResponse response) {
         try {
             ProductDto productDto = productService.getProductWithLowestPriceByName(productName);
+
+            Cookie[] cookies = request.getCookies();
+            Cookie oldCookie = findCookie(cookies, "view_count");
+
+            if(oldCookie != null) {
+                if(!oldCookie.getValue().contains("[" + productId + "]")) {
+                    oldCookie.setValue(oldCookie.getValue() + "[" + productId + "]");
+                    oldCookie.setPath("/");
+                    response.addCookie(oldCookie);
+                    // 조회수 증가
+                    productService.incrementViewCount(productId);
+                }
+            }
+            else {
+                Cookie newCookie = new Cookie("view_count", "[" + productId + "]");
+                newCookie.setPath("/");
+                response.addCookie(newCookie);
+                productService.incrementViewCount(productId);
+            }
 
             String imageUrl = s3Service.getProductImageUrl(productName);
             productDto.setImageUrl(imageUrl);
@@ -96,6 +120,17 @@ public class ProductController {
             log.error(e.getMessage());
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
         }
+    }
+
+    private Cookie findCookie(Cookie[] cookies, String name) {
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals(name)) {
+                    return c;
+                }
+            }
+        }
+        return null;
     }
 
     @GetMapping("/products")
@@ -144,6 +179,27 @@ public class ProductController {
             });
             return products;
 
+        } catch (CustomException e) {
+            log.error(e.getDetailMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/popular-products")
+    public List<ProductDto> findPopularProducts() {
+        try {
+
+            List<ProductDto> products = productService.getPopularProducts();
+
+            products.forEach(product -> {
+                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                product.setImageUrl(imageUrl);
+            });
+
+            return products;
         } catch (CustomException e) {
             log.error(e.getDetailMessage());
             throw e;

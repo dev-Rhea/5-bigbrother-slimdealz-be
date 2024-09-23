@@ -2,6 +2,8 @@ package bigbrother.slimdealz.entity.product;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,14 +21,14 @@ public class PriceHistory {
     @Column(name = "product_name", nullable = false)
     private String productName;
 
-    @Column(name = "previous_price", nullable = false)
+    @Column(name = "previous_price")
     private int previousPrice;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;  // Instant에서 LocalDateTime으로 변경
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "end_at")
-    private LocalDateTime endAt;  // Instant에서 LocalDateTime으로 변경
+    private LocalDateTime endAt;
 
     @ManyToOne
     @JoinColumn(name = "price_id", nullable = false, foreignKey = @ForeignKey(name = "FK_PriceHistory_Price"))

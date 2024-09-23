@@ -1,10 +1,10 @@
 package bigbrother.slimdealz.repository.Product;
 
-import bigbrother.slimdealz.dto.product.ChartDto;
+import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.entity.product.Product;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -27,5 +27,7 @@ public interface ProductRepositoryCustom {
     // 랜덤 추천
     List<Product> findRandomProducts();
 
-
+    // 인기 급상승
+    List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo);
+    List<ProductDto> findTopProductsByPrice();
 }
