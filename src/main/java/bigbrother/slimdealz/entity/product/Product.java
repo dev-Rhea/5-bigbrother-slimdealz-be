@@ -21,13 +21,13 @@ public class Product extends BaseEntity {
     Long id;
 
     @Column(name = "product_name", nullable = false)
-    String name;
+    private String productName;
 
     @Column(name = "product_category", nullable = false)
-    String category;
+    private String category;
 
     @Column(name = "shipping_price")
-    String shippingFee;
+    private String shippingFee;
 
     @Column(name = "vendor_url", nullable = false)
     private String vendorUrl;
