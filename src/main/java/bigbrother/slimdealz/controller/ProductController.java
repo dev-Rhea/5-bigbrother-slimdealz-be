@@ -1,7 +1,6 @@
 package bigbrother.slimdealz.controller;
 
 import bigbrother.slimdealz.dto.product.ProductDto;
-import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.service.ProductService;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.*;
+
 
 @Slf4j
 @RestController
@@ -90,11 +90,27 @@ public class ProductController {
         try {
             ProductDto productDto = productService.getProductWithLowestPriceByName(productName);
 
+            Cookie[] cookies = request.getCookies();
+            Cookie oldCookie = findCookie(cookies, "view_count");
+
+            if(oldCookie != null) {
+                if(!oldCookie.getValue().contains("[" + productId + "]")) {
+                    oldCookie.setValue(oldCookie.getValue() + "[" + productId + "]");
+                    oldCookie.setPath("/");
+                    response.addCookie(oldCookie);
+                    // 조회수 증가
+                    productService.incrementViewCount(productId);
+                }
+            }
+            else {
+                Cookie newCookie = new Cookie("view_count", "[" + productId + "]");
+                newCookie.setPath("/");
+                response.addCookie(newCookie);
+                productService.incrementViewCount(productId);
+            }
+
             String imageUrl = s3Service.getProductImageUrl(productName);
             productDto.setImageUrl(imageUrl);
-
-            Cookie viewCountCookie = productService.addViewCount(request, response, productId);
-            response.addCookie(viewCountCookie);
 
             return productDto;
 
@@ -105,6 +121,17 @@ public class ProductController {
             log.error(e.getMessage());
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
         }
+    }
+
+    private Cookie findCookie(Cookie[] cookies, String name) {
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals(name)) {
+                    return c;
+                }
+            }
+        }
+        return null;
     }
 
     @GetMapping("/products")
@@ -165,7 +192,8 @@ public class ProductController {
     @GetMapping("/popular-products")
     public List<ProductDto> findPopularProducts() {
         try {
-            List<ProductDto> products = productService.getPopularProducts(LocalDateTime.now().minusHours(1));
+
+            List<ProductDto> products = productService.getPopularProducts();
 
             products.forEach(product -> {
                 String imageUrl = s3Service.getProductImageUrl(product.getName());
