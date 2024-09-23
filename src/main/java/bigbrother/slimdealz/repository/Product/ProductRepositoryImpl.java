@@ -1,6 +1,5 @@
 package bigbrother.slimdealz.repository.Product;
 
-import bigbrother.slimdealz.dto.product.ProductConverter;
 import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.entity.product.QPrice;
@@ -11,7 +10,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -19,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 @Repository
@@ -65,11 +62,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 queryFactory
                         .selectFrom(product)
                         .where(
-                                product.name.containsIgnoreCase(keyword),
+                                product.productName.containsIgnoreCase(keyword),
                                 lastSeenId != null ? product.id.gt(lastSeenId) : null,
                                 product.createdAt.between(startOfDay, endOfDay)
                         )
-                        .groupBy(product.name) // name을 기준으로 그룹화
+                        .groupBy(product.productName) // name을 기준으로 그룹화
                         .having(product.prices.any().setPrice.eq( // 최저가 조건 추가
                                 JPAExpressions
                                         .select(priceSub.setPrice.min()) // 최저가 서브쿼리
@@ -103,10 +100,10 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 Collections.singletonList(queryFactory
                         .selectFrom(product)
                         .join(product.prices, price)
-                        .where(product.name.eq(productName),
+                        .where(product.productName.eq(productName),
                                 price.createdAt.between(startOfDay, endOfDay)) // 상품명과 일치하는 상품만 조회
                         .groupBy(product.id, price.vendor.id)
-                        .orderBy(product.name.asc(), price.setPrice.asc()) // 할인가 기준 최저가 정렬
+                        .orderBy(product.productName.asc(), price.setPrice.asc()) // 할인가 기준 최저가 정렬
                         .fetchFirst()) // 정렬한 상품 중 첫번째 상품 반환
         );
 
@@ -131,7 +128,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                         JPAExpressions.select(priceSub.setPrice.min())
                                                 .from(priceSub)
                                                 .join(priceSub.product, productSub)
-                                                .where(productSub.name.eq(product.name))
+                                                .where(productSub.productName.eq(product.productName))
                                 )
                         )
                         .orderBy(product.id.asc())
@@ -148,7 +145,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         .selectFrom(product)
                         .leftJoin(product.prices, price)
                         .fetchJoin()
-                        .where(product.name.eq(productName)
+                        .where(product.productName.eq(productName)
                                 , product.createdAt.between(startOfDay, endOfDay)
                                 , price.createdAt.between(startOfDay, endOfDay)
                                 ,vendor.createdAt.between(startOfDay, endOfDay))
@@ -187,7 +184,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .select(Projections.fields(
                         ProductDto.class,
                         product.id.as("id"),
-                        product.name.as("name"),
+                        product.productName.as("name"),
                         product.category.as("category"),
                         product.viewCount.as("viewCount"),
                         product.updatedAt.as("updatedAt")
@@ -207,7 +204,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .select(Projections.fields(
                         ProductDto.class,
                         qProduct.id.as("id"),
-                        qProduct.name.as("name"),
+                        qProduct.productName.as("name"),
                         qProduct.category.as("category"),
                         qProduct.viewCount.as("viewCount"),
                         qProduct.viewedAt.as("viewedAt"),

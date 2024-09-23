@@ -10,7 +10,7 @@ public class ProductConverter {
     public static ProductDto toProductDTO(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
-                .name(product.getName())
+                .name(product.getProductName())
                 .category(product.getCategory())
                 .shippingFee(product.getShippingFee())
                 .vendorUrl(product.getVendorUrl())
