@@ -58,5 +58,4 @@ public class MemberService {
             throw new RuntimeException("User not found with kakao_Id: " + kakao_Id);
         }
     }
-
 }

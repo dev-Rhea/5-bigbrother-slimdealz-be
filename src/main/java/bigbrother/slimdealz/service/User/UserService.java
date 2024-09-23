@@ -16,16 +16,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-//    @Autowired
-//    public UserService(UserRepository userRepository) {
-//        this.userRepository = userRepository;
-//    }
-
-    /*
-    메서드 명에서도 camelCase적용해주세요
-     */
-    public Long findUserIdByKakao_Id(String kakao_Id) {
-        return userRepository.findByKakao_Id(kakao_Id)
+    public Long findUserIdByKakaoId(String kakaoId) {
+        return userRepository.findByKakaoId(kakaoId)
                 .map(Member::getId)
                 .orElse(null);
     }
