@@ -180,16 +180,22 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo) {
+        QProduct product = QProduct.product;
+        QPrice price = QPrice.price;
+
         return queryFactory
                 .select(Projections.fields(
                         ProductDto.class,
                         product.id.as("id"),
                         product.productName.as("name"),
                         product.category.as("category"),
+                        price.setPrice.as("price"),
                         product.viewCount.as("viewCount"),
+                        product.viewedAt.as("viewedAt"),
                         product.updatedAt.as("updatedAt")
                 ))
                 .from(product)
+                .leftJoin(product.prices, price)
                 .where(product.viewCount.gt(0), product.updatedAt.after(LocalDate.now().atStartOfDay()))
                 .orderBy(product.viewCount.desc())
                 .limit(10)
