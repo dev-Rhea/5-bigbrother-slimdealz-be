@@ -11,6 +11,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -177,10 +178,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<Product> findPopularProducts(LocalDateTime oneHourAgo) {
+    public List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo) {
         return queryFactory
-                .selectFrom(product)
-                .where(product.viewCount.gt(0), product.updatedAt.after(oneHourAgo))
+                .select(Projections.fields(
+                        ProductDto.class,
+                        product.id.as("id"),
+                        product.name.as("name"),
+                        product.category.as("category"),
+                        product.viewCount.as("viewCount"),
+                        product.updatedAt.as("updatedAt")
+                ))
+                .from(product)
+                .where(product.viewCount.gt(0), product.updatedAt.after(LocalDate.now().atStartOfDay()))
                 .orderBy(product.viewCount.desc())
                 .limit(10)
                 .fetch();
