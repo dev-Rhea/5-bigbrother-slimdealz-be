@@ -136,4 +136,60 @@ public class ProductService {
         }
         return products;
     }
+
+    // 가격 비교 차트
+    @Transactional
+    public List<ChartDto> getChartData(String productName, String dateLimit) {
+        LocalDateTime startDateTime;
+
+        // dateLimit 값에 따른 날짜 계산
+        if ("week".equalsIgnoreCase(dateLimit)) {
+            startDateTime = LocalDateTime.now().minusWeeks(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        } else if ("month".equalsIgnoreCase(dateLimit)) {
+            startDateTime = LocalDateTime.now().minusMonths(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        } else {
+            throw new IllegalArgumentException("Invalid dateLimit. It should be either 'week' or 'month'.");
+        }
+
+        // LocalDateTime을 바로 사용하여 데이터 조회
+        return priceHistoryRepository.findChartData(productName, startDateTime);
+    }
+
+    // 인기 급상승 상품 갱신
+    @Scheduled(cron = "0 0 * * * ?")
+    @Transactional
+    public void updatePopularProducts() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+
+        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo);
+
+        if (popularProducts.isEmpty()) {
+            popularProducts = productRepository.findTopProductsByPrice();
+        }
+
+        // 점수 업데이트
+        for(ProductDto p : popularProducts) {
+            Product product = productRepository.findById(p.getId())
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND));
+
+            int delta = popularProducts.stream().anyMatch(productDto -> productDto.getId().equals(product.getId())) ? -1 : 1;
+            product.adjustScore(delta);
+            productRepository.save(product);
+        }
+        System.out.println("인기 급상승 상품이 업데이트 되었습니다.");
+    }
+
+    // 인기 급상승 상품 조회
+    @Transactional
+    public List<ProductDto> getPopularProducts() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+
+        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo);
+
+        if(popularProducts.isEmpty()) {
+            popularProducts = productRepository.findTopProductsByPrice();
+        }
+
+        return popularProducts;
+    }
 }
