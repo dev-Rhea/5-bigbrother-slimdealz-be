@@ -66,10 +66,10 @@ public class BookmarkService {
             return BookmarkProductPriceDto.builder()
                     .bookmarkId(bookmark.getId())
                     .productId(bookmark.getProduct().getId())
-                    .productName(bookmark.getProduct().getName())  // Product 엔티티에서 productName 가져옴
+                    .productName(bookmark.getProduct().getProductName())  // Product 엔티티에서 productName 가져옴
                     .shippingFee(bookmark.getProduct().getShippingFee())
                     .prices(prices)
-                    .image(s3Service.getProductImageUrl(bookmark.getProduct().getName()))
+                    .image(s3Service.getProductImageUrl(bookmark.getProduct().getProductName()))
                     .build();
         }).collect(Collectors.toList());
     }
@@ -86,7 +86,7 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 상품 이름으로 모든 상품을 검색하고, 최저가 상품을 선택
-        Product cheapestProduct = productRepository.findByName(productName).stream()
+        Product cheapestProduct = productRepository.findByProductName(productName).stream()
                 .min(Comparator.comparing(product -> product.getPrices().stream()
                         .min(Comparator.comparing(price -> price.getSetPrice()))
                         .orElseThrow(() -> new RuntimeException("Price not found")).getSetPrice()))
@@ -115,7 +115,7 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 상품 이름으로 최저가 상품을 선택
-        Product cheapestProduct = productRepository.findByName(productName).stream()
+        Product cheapestProduct = productRepository.findByProductName(productName).stream()
                 .min(Comparator.comparing(product -> product.getPrices().stream()
                         .min(Comparator.comparing(price -> price.getSetPrice()))
                         .orElseThrow(() -> new RuntimeException("Price not found")).getSetPrice()))

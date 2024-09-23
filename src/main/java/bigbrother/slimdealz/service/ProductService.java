@@ -17,14 +17,16 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final S3Service s3Service;
+    private final PriceHistoryRepository priceHistoryRepository;
 
     // 상품 검색
+    @Transactional
     public List<ProductDto> searchProducts(String keyword, Long lastSeenId, int size) {
         List<ProductDto> products = productRepository.searchByKeyword(keyword, lastSeenId, size)
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 }) //converter 를 통해 DTO 로 변환
@@ -37,12 +39,13 @@ public class ProductService {
     }
 
     // 오늘의 최저가 상품 목록
+    @Transactional
     public List<ProductDto> findLowestPriceProducts() {
         List<ProductDto> products = productRepository.findLowestPriceProducts()
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 })
@@ -55,6 +58,7 @@ public class ProductService {
     }
 
     // 상품 상세 페이지 정보
+    @Transactional
     public ProductDto getProductWithLowestPriceByName(String productName) {
         Product product = productRepository.findProductWithLowestPriceByName(productName);
 
@@ -65,19 +69,29 @@ public class ProductService {
         ProductDto productDto = ProductConverter.toProductDTO(product);
 
         String imageUrl = s3Service.getProductImageUrl(productName);
-
         productDto.setImageUrl(imageUrl);
 
         return productDto;
     }
 
+    // 상품 조회수 증가
+    @Transactional
+    public void incrementViewCount(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND));
+
+        product.incrementViewCount();
+        productRepository.save(product);
+    }
+
     // 카테고리 별 상품 조회
+    @Transactional
     public List<ProductDto> findByCategory(String category, Long lastSeenId, int size) {
         List<ProductDto> products = productRepository.findByCategory(category, lastSeenId, size)
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 })
@@ -90,6 +104,7 @@ public class ProductService {
     }
 
     // 판매처 리스트
+    @Transactional
     public List<ProductDto> getProductWithVendors(String productName) {
         List<Product> products = productRepository.findProductWithVendors(productName);
 
@@ -99,12 +114,13 @@ public class ProductService {
     }
 
     // 랜덤 추천
+    @Transactional
     public  List<ProductDto> findRandomProducts() {
         List<ProductDto> products = productRepository.findRandomProducts()
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 })

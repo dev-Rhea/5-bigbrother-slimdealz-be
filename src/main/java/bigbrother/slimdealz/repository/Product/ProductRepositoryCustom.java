@@ -25,4 +25,8 @@ public interface ProductRepositoryCustom {
 
     // 랜덤 추천
     List<Product> findRandomProducts();
+
+    // 인기 급상승
+    List<ProductDto> findPopularProducts(LocalDateTime oneHourAgo);
+    List<ProductDto> findTopProductsByPrice();
 }

@@ -19,6 +19,9 @@ public class ProductDto {
     private String shippingFee;
     private String vendorUrl;
     private String imageUrl;
+    private int viewCount;
+    private Integer score;
+    private LocalDateTime viewedAt;
     private List<PriceDto> prices;
 }
 
