@@ -40,7 +40,7 @@ public class Product extends BaseEntity {
     private LocalDateTime viewedAt;
 
     @Column(name = "score")
-    private int score;
+    private Integer score;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Price> prices;
@@ -48,6 +48,7 @@ public class Product extends BaseEntity {
     // 조회수 추가
     public void incrementViewCount() {
         this.viewCount++;
+        this.viewedAt = LocalDateTime.now();
     }
 
     // 점수 추가
