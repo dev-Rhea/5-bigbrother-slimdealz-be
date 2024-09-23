@@ -1,14 +1,15 @@
 package bigbrother.slimdealz.repository.Product;
 
+import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.entity.product.QPrice;
 import bigbrother.slimdealz.entity.product.QProduct;
 import bigbrother.slimdealz.entity.product.QVendor;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;

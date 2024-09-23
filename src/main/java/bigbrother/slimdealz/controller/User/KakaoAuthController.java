@@ -7,7 +7,6 @@ import bigbrother.slimdealz.auth.KakaoUserInfo;
 import bigbrother.slimdealz.entity.Member;
 import bigbrother.slimdealz.service.User.MemberService;
 import com.google.gson.Gson;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +34,6 @@ public class KakaoAuthController {
     @Value("${CLIENT_URL}")
     private String clientUrl; // 클라이언트 URL
 
-    @Autowired
     private final MemberService memberService;
     private final RestTemplate restTemplate;
 
@@ -57,7 +53,6 @@ public class KakaoAuthController {
     public ResponseEntity<?> handleKakaoCallback(@RequestParam("code") String code) {
         // 1. 카카오 서버에 액세스 토큰 요청
         Map<String, Object> tokens = getKakaoAccessToken(code);
-
         String accessToken = (String) tokens.get("access_token");
         String refreshToken = (String) tokens.get("refresh_token");
         int expiresIn = getExpiresIn(tokens); // 액세스 토큰의 만료 시간

@@ -24,7 +24,7 @@ public class Product extends BaseEntity {
     private String productName;
 
     @Column(name = "product_category", nullable = false)
-    String category;
+    private String category;
 
     @Column(name = "shipping_price")
     private String shippingFee;
