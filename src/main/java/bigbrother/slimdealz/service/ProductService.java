@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final S3Service s3Service;
+    private final PriceHistoryRepository priceHistoryRepository;
 
     // 상품 검색
     @Transactional
@@ -171,5 +172,23 @@ public class ProductService {
         }
 
         return popularProducts;
+    }
+}
+
+    @Transactional
+    public List<ChartDto> getChartData(String productName, String dateLimit) {
+        LocalDateTime startDateTime;
+
+        // dateLimit 값에 따른 날짜 계산
+        if ("week".equalsIgnoreCase(dateLimit)) {
+            startDateTime = LocalDateTime.now().minusWeeks(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        } else if ("month".equalsIgnoreCase(dateLimit)) {
+            startDateTime = LocalDateTime.now().minusMonths(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        } else {
+            throw new IllegalArgumentException("Invalid dateLimit. It should be either 'week' or 'month'.");
+        }
+
+        // LocalDateTime을 바로 사용하여 데이터 조회
+        return priceHistoryRepository.findChartData(productName, startDateTime);
     }
 }

@@ -5,8 +5,8 @@ import lombok.*;
 
 import java.time.Instant;
 
-@Table(name = "priceHistory")
 @Entity
+@Table(name = "priceHistory")  // 테이블 이름을 대소문자에 맞춰 사용
 @Builder
 @AllArgsConstructor
 @Getter

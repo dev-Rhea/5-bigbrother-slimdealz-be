@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.*;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/v1")
@@ -208,7 +207,22 @@ public class ProductController {
             log.error(e.getMessage());
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
         }
-
     }
 
+    @GetMapping("/price-compare")
+    public List<ChartDto> getChartData(
+            @RequestParam("productName") String productName,
+            @RequestParam("dateLimit") String dateLimit
+    ){
+        try{
+            List<ChartDto> chart = productService.getChartData(productName, dateLimit);
+            return chart;
+        } catch (CustomException e) {
+            log.error(e.getDetailMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
+        }
+    }
 }

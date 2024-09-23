@@ -38,9 +38,13 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private List<Product> backToDayList(LocalDateTime startOfDay, LocalDateTime endOfDay, Function<JPAQueryFactory, List<Product>> queryFunction) {
         List<Product> products = queryFunction.apply(queryFactory);
 
-        while (products.isEmpty()) {
+        int maxDaysBack = 3;  // 예시: 최대 3일 이전까지만 조회
+        int daysBack = 0;
+
+        while (products.isEmpty() && daysBack < maxDaysBack) {
             startOfDay = startOfDay.minusDays(1);
             endOfDay = endOfDay.minusDays(1);
+            daysBack++;
 
             products = queryFunction.apply(queryFactory);
 
