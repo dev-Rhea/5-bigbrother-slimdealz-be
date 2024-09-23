@@ -1,7 +1,9 @@
 package bigbrother.slimdealz.controller.User;
 
+import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.dto.user.BookmarkDto;
 import bigbrother.slimdealz.dto.user.BookmarkProductPriceDto;
+import bigbrother.slimdealz.service.ProductService;
 import bigbrother.slimdealz.service.User.BookmarkService;
 import bigbrother.slimdealz.service.User.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ public class BookmarkController {
 
     private final BookmarkService bookmarkService;
     private final UserService userService;
+    private final ProductService productService;
 
     // 북마크 목록 조회 (JWT로 인증된 사용자)
     @GetMapping("/bookmarks")
@@ -86,5 +89,18 @@ public class BookmarkController {
 
         bookmarkService.removeBookmarkByProductName(id, productName);
         return ResponseEntity.noContent().build();
+    }
+
+    // 북마크 기반 상품 추천
+    @GetMapping("/{kakaoId}/bookmarks/recommend-products")
+    public ResponseEntity<List<ProductDto>> getRecommendedProductsByBookmark(@PathVariable String kakao_Id) {
+        try {
+            List<ProductDto> recommendedProducts = productService.getPopularProducts();
+
+            return ResponseEntity.ok(recommendedProducts);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

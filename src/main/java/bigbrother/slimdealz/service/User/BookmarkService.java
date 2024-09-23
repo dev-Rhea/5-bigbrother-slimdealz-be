@@ -1,6 +1,8 @@
 package bigbrother.slimdealz.service.User;
 
 import bigbrother.slimdealz.dto.product.PriceDto;
+import bigbrother.slimdealz.dto.product.ProductConverter;
+import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.dto.product.VendorDto;
 import bigbrother.slimdealz.dto.user.BookmarkDto;
 import bigbrother.slimdealz.dto.user.BookmarkProductPriceDto;
@@ -13,6 +15,7 @@ import bigbrother.slimdealz.repository.User.MemberRepository;
 import bigbrother.slimdealz.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Comparator;
@@ -125,5 +128,15 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
 
         bookmarkRepository.delete(bookmark);
+    }
+
+    // 북마크 기반 추천 상품
+    @Transactional(readOnly = true)
+    public List<ProductDto> getRecommendedBookmarkProducts(Long userId) {
+        List<Product> recommendedProducts = bookmarkRepository.findRecommendedProducts(userId);
+
+        return recommendedProducts.stream()
+                .map(ProductConverter::toProductDTO)
+                .collect(Collectors.toList());
     }
 }
