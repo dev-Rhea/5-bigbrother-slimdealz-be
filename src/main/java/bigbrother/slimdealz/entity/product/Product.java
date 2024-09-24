@@ -5,6 +5,7 @@ import bigbrother.slimdealz.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name = "products")
@@ -20,17 +21,38 @@ public class Product extends BaseEntity {
     Long id;
 
     @Column(name = "product_name", nullable = false)
-    String name;
+    private String productName;
 
     @Column(name = "product_category", nullable = false)
-    String category;
+    private String category;
 
     @Column(name = "shipping_price")
-    String shippingFee;
+    private String shippingFee;
 
     @Column(name = "vendor_url", nullable = false)
     private String vendorUrl;
 
+    @Setter
+    @Column(name = "view_count")
+    private int viewCount = 0;
+
+    @Column(name = "viewed_at", nullable = false)
+    private LocalDateTime viewedAt;
+
+    @Column(name = "score")
+    private Integer score;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Price> prices;
+
+    // 조회수 추가
+    public void incrementViewCount() {
+        this.viewCount++;
+        this.viewedAt = LocalDateTime.now();
+    }
+
+    // 점수 추가
+    public void adjustScore(int delta) {
+        this.score += delta;
+    }
 }

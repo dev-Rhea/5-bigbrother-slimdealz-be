@@ -19,14 +19,15 @@ public class BookmarkController {
 
     private final BookmarkService bookmarkService;
     private final UserService userService;
+    private final ProductService productService;
 
     // 북마크 목록 조회 (JWT로 인증된 사용자)
     @GetMapping("/bookmarks")
     public ResponseEntity<List<BookmarkProductPriceDto>> getUserBookmarks(HttpServletRequest request) {
         // JWT에서 추출된 kakao_Id를 요청에서 가져옴
-        String kakao_Id = (String) request.getAttribute("kakao_Id");
+        String kakaoId = (String) request.getAttribute("kakao_Id");
 
-        Long id = userService.findUserIdByKakao_Id(kakao_Id);
+        Long id = userService.findUserIdByKakaoId(kakaoId);
         if (id == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -41,9 +42,9 @@ public class BookmarkController {
             HttpServletRequest request,
             @RequestParam("productName") String productName) {
         // JWT에서 추출된 kakao_Id를 요청에서 가져옴
-        String kakao_Id = (String) request.getAttribute("kakao_Id");
+        String kakaoId = (String) request.getAttribute("kakao_Id");
 
-        Long id = userService.findUserIdByKakao_Id(kakao_Id);
+        Long id = userService.findUserIdByKakaoId(kakaoId);
         if (id == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -57,9 +58,9 @@ public class BookmarkController {
             HttpServletRequest request,
             @RequestBody BookmarkProductPriceDto bookmarkProductPriceDto) {
         // JWT에서 추출된 kakao_Id를 요청에서 가져옴
-        String kakao_Id = (String) request.getAttribute("kakao_Id");
+        String kakaoId = (String) request.getAttribute("kakaoId");
 
-        Long id = userService.findUserIdByKakao_Id(kakao_Id);
+        Long id = userService.findUserIdByKakaoId(kakaoId);
         if (id == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -74,14 +75,33 @@ public class BookmarkController {
             HttpServletRequest request,
             @RequestParam("productName") String productName) {
         // JWT에서 추출된 kakao_Id를 요청에서 가져옴
-        String kakao_Id = (String) request.getAttribute("kakao_Id");
+        String kakaoId = (String) request.getAttribute("kakao_Id");
 
-        Long id = userService.findUserIdByKakao_Id(kakao_Id);
+        Long id = userService.findUserIdByKakaoId(kakaoId);
         if (id == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         bookmarkService.removeBookmarkByProductName(id, productName);
         return ResponseEntity.noContent().build();
+    }
+
+    // 북마크 기반 상품 추천
+    @GetMapping("/bookmarks/recommend-products")
+    public ResponseEntity<List<ProductDto>> getRecommendedProductsByBookmark(HttpServletRequest request) {
+        try {
+            String kakaoId = (String) request.getAttribute("kakao_Id");
+
+            Long id = userService.findUserIdByKakaoId(kakaoId);
+            if (id == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            List<ProductDto> recommendedProducts = productService.getPopularProducts();
+
+            return ResponseEntity.ok(recommendedProducts);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }
