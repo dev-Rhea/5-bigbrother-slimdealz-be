@@ -81,12 +81,21 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     // 오늘의 최저가
     @Override
     public List<Product> findLowestPriceProducts() {
+        QPrice subPrice = new QPrice("subPrice");
+
         return backToDayList(startOfDay, endOfDay, queryFactory ->
                 queryFactory
                         .select(product)
                         .from(price)
                         .join(price.product, product)
-                        .where(price.createdAt.between(startOfDay, endOfDay))
+                        .where(price.createdAt.between(startOfDay, endOfDay)
+                                .and(price.setPrice.eq(
+                                        JPAExpressions
+                                                .select(subPrice.setPrice.min())
+                                                .from(subPrice)
+                                                .where(subPrice.product.productName.eq(product.productName)
+                                                        .and(subPrice.createdAt.between(startOfDay, endOfDay)))
+                                )))
                         .orderBy(price.setPrice.asc())
                         .limit(10)
                         .fetch()
