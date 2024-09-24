@@ -1,4 +1,5 @@
 spring:
+  CLIENT_SERVER: ${CLIENT_URL}
   sentry:
     dsn: ${SENTRY_DSN}
   jwt:

@@ -65,7 +65,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.productName.containsIgnoreCase(keyword),
                                 lastSeenId != null ? product.id.gt(lastSeenId) : null,
                                 product.createdAt.between(startOfDay, endOfDay),
-                                lastSeenProductName != null ? product.name.ne(lastSeenProductName) : null
+                                lastSeenProductName != null ? product.productName.ne(lastSeenProductName) : null
                         )
                         .groupBy(product.productName) // name을 기준으로 그룹화
                         .having(product.prices.any().setPrice.eq( // 최저가 조건 추가
@@ -134,7 +134,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.category.eq(category),
                                 lastSeenId != null ? product.id.gt(lastSeenId) : null,
                                 product.createdAt.between(startOfDay, endOfDay),
-                                lastSeenProductName != null ? product.name.ne(lastSeenProductName) : null,
+                                lastSeenProductName != null ? product.productName.ne(lastSeenProductName) : null,
                                 price.setPrice.eq(
                                         JPAExpressions.select(priceSub.setPrice.min())
                                                 .from(priceSub)
