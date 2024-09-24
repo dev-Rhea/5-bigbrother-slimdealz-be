@@ -216,6 +216,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     @Override
     public List<ProductDto> findTopProductsByPrice() {
         QProduct qProduct = QProduct.product;
+        QPrice price = QPrice.price;
+
 
         return queryFactory
                 .select(Projections.fields(
@@ -223,11 +225,13 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         qProduct.id.as("id"),
                         qProduct.productName.as("name"),
                         qProduct.category.as("category"),
+                        price.setPrice.as("price"),
                         qProduct.viewCount.as("viewCount"),
                         qProduct.viewedAt.as("viewedAt"),
                         qProduct.prices.any().setPrice.as("price")
                 ))
                 .from(qProduct)
+                .leftJoin(qProduct.prices, price)
                 .orderBy(qProduct.prices.any().setPrice.desc())
                 .limit(10)
                 .fetch();
