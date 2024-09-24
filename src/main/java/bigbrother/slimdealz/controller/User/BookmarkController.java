@@ -1,15 +1,17 @@
 package bigbrother.slimdealz.controller.User;
 
+import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.dto.user.BookmarkDto;
 import bigbrother.slimdealz.dto.user.BookmarkProductPriceDto;
+import bigbrother.slimdealz.service.ProductService;
 import bigbrother.slimdealz.service.User.BookmarkService;
 import bigbrother.slimdealz.service.User.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
