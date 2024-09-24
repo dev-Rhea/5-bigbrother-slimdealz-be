@@ -3,11 +3,13 @@ package bigbrother.slimdealz.service;
 import bigbrother.slimdealz.dto.product.ChartDto;
 import bigbrother.slimdealz.dto.product.ProductConverter;
 import bigbrother.slimdealz.dto.product.ProductDto;
+import bigbrother.slimdealz.dto.product.ReviewDto;
 import bigbrother.slimdealz.entity.product.Product;
 import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.repository.Product.PriceHistoryRepository;
 import bigbrother.slimdealz.repository.Product.ProductRepository;
+import bigbrother.slimdealz.repository.Product.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final S3Service s3Service;
     private final PriceHistoryRepository priceHistoryRepository;
+    private final ReviewRepository reviewRepository;
 
     // 상품 검색
     @Transactional
@@ -147,4 +150,13 @@ public class ProductService {
         return priceHistoryRepository.findChartData(productName, startDateTime);
     }
 
+    public List<ReviewDto> getReview(String productName) {
+
+        List<ReviewDto> reviewDtosByProductName = reviewRepository.findReviewDtosByProductName(productName);
+
+        if(reviewDtosByProductName.isEmpty()) {
+            throw new CustomException(CustomErrorCode.REVIEW_NOT_FOUND);
+        }
+        return reviewDtosByProductName;
+    }
 }
