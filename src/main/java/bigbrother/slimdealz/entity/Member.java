@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name= "users")
+/*
+동일한 이유로 @Setter를 포함하는 어노테이션인, @Data 의 사용 또한 지양합니다.
+ */
 @Data
 @Builder
 @AllArgsConstructor

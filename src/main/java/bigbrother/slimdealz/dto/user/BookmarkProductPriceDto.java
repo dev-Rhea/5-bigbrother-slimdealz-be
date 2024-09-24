@@ -26,6 +26,10 @@ public class BookmarkProductPriceDto {
     private Double salePrice;
     private Double discountRate; // 할인율을 직접 계산하여 포함
 
+    /*
+    현재 크롤링 이슈로 정가를 가져오지 않고 있어서,
+    삭제하셔도 될 것 같습니다.
+     */
     // 할인율을 계산하는 메서드
     public Double calculateDiscountRate() {
         if (originalPrice != null && salePrice != null && originalPrice > 0) {

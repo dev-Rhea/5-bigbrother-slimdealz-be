@@ -192,5 +192,4 @@ public class ProductService {
 
         return popularProducts;
     }
-
 }

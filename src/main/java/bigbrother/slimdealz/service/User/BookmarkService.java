@@ -1,6 +1,8 @@
 package bigbrother.slimdealz.service.User;
 
 import bigbrother.slimdealz.dto.product.PriceDto;
+import bigbrother.slimdealz.dto.product.ProductConverter;
+import bigbrother.slimdealz.dto.product.ProductDto;
 import bigbrother.slimdealz.dto.product.VendorDto;
 import bigbrother.slimdealz.dto.user.BookmarkDto;
 import bigbrother.slimdealz.dto.user.BookmarkProductPriceDto;
@@ -13,6 +15,7 @@ import bigbrother.slimdealz.repository.User.MemberRepository;
 import bigbrother.slimdealz.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Comparator;
@@ -43,6 +46,9 @@ public class BookmarkService {
         return !bookmarks.isEmpty();
     }
 
+    /*
+    DTO로 변환하는 메서드를 분리하여 재사용성을 높이는 것이 좋을 것 같습니다.
+     */
     // 유저의 북마크 리스트를 가져오는 메서드
     public List<BookmarkProductPriceDto> getUserBookmarksWithPrice(Long userId) {
         List<Bookmark> bookmarks = bookmarkRepository.findBookmarksWithProductsAndPrices(userId);
@@ -70,6 +76,12 @@ public class BookmarkService {
                     .build();
         }).collect(Collectors.toList());
     }
+
+    /*
+    북마크 생성 메서드와 삭제 메서드에서
+    중복된 코드들이 많으니 중복 코드를 제거하고
+    상품을 조회, 사용자 조회 메서드를 분리하여 사용하는 것이 좋을 것 같습니다.
+     */
 
     // 상품 이름으로 북마크 추가하는 메서드 (최저가 상품을 선택)
     public BookmarkDto addBookmarkByProductName(Long userId, String productName) {
@@ -116,5 +128,15 @@ public class BookmarkService {
                 .orElseThrow(() -> new RuntimeException("Bookmark not found"));
 
         bookmarkRepository.delete(bookmark);
+    }
+
+    // 북마크 기반 추천 상품
+    @Transactional(readOnly = true)
+    public List<ProductDto> getRecommendedBookmarkProducts(Long userId) {
+        List<Product> recommendedProducts = bookmarkRepository.findRecommendedProducts(userId);
+
+        return recommendedProducts.stream()
+                .map(ProductConverter::toProductDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -3,7 +3,6 @@ package bigbrother.slimdealz.entity.product;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
