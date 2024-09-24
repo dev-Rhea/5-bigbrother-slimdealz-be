@@ -34,9 +34,9 @@ public class Product extends BaseEntity {
 
     @Setter
     @Column(name = "view_count")
-    private int viewCount = 0;
+    private int viewCount;
 
-    @Column(name = "viewed_at", nullable = false)
+    @Column(name = "viewed_at")
     private LocalDateTime viewedAt;
 
     @Column(name = "score")
@@ -53,6 +53,9 @@ public class Product extends BaseEntity {
 
     // 점수 추가
     public void adjustScore(int delta) {
+        if(this.score == null) {
+            this.score = 0;
+        }
         this.score += delta;
     }
 }

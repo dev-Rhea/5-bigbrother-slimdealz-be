@@ -35,7 +35,7 @@ public class ProductController {
             try {
                 List<ProductDto> products = productService.searchProducts(keyword, lastSeenId, lastSeenProductName ,size);
                 products.forEach(product -> {
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     product.setImageUrl(imageUrl);
                 });
                 return products;
@@ -67,7 +67,7 @@ public class ProductController {
             List<ProductDto> products = productService.findLowestPriceProducts();
 
             products.forEach(product -> {
-                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                 product.setImageUrl(imageUrl);
             });
             return products;
@@ -143,7 +143,7 @@ public class ProductController {
             List<ProductDto> products = productService.findByCategory(category, lastSeenId, lastSeenProductName, size);
 
             products.forEach(product -> {
-                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                 product.setImageUrl(imageUrl);
             });
             return products;
@@ -176,7 +176,7 @@ public class ProductController {
         try {
             List<ProductDto> products = productService.findRandomProducts();
             products.forEach(product -> {
-                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                 product.setImageUrl(imageUrl);
             });
             return products;
@@ -197,7 +197,7 @@ public class ProductController {
             List<ProductDto> products = productService.getPopularProducts();
 
             products.forEach(product -> {
-                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                 product.setImageUrl(imageUrl);
             });
 

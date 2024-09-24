@@ -15,7 +15,7 @@ import java.util.List;
 public class ProductDto {
 
     private Long id;
-    private String name;
+    private String productName;
     private String category;
     private String shippingFee;
     private String vendorUrl;
