@@ -29,6 +29,8 @@ public class ProductConverter {
                 .promotion(price.getPromotion())
                 .productId(price.getProduct().getId())
                 .vendor(toVendorDTO(price.getVendor()))
+                .createdAt(price.getCreatedAt())
+                .updatedAt(price.getUpdatedAt())
                 .build();
     }
 
