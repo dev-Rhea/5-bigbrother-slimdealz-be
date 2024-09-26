@@ -93,19 +93,28 @@ public class ProductController {
             Cookie[] cookies = request.getCookies();
             Cookie oldCookie = findCookie(cookies, "view_count");
 
+            boolean isNewViewCount = true;
+
             if(oldCookie != null) {
-                if(!oldCookie.getValue().contains("[" + productId + "]")) {
+                if(oldCookie.getValue().contains("[" + productId + "]")) {
+                    isNewViewCount = false;
+                    // 조회수 증가
+//                    productService.incrementViewCount(productId);
+                }
+                else {
                     oldCookie.setValue(oldCookie.getValue() + "[" + productId + "]");
                     oldCookie.setPath("/");
                     response.addCookie(oldCookie);
-                    // 조회수 증가
-                    productService.incrementViewCount(productId);
                 }
             }
             else {
                 Cookie newCookie = new Cookie("view_count", "[" + productId + "]");
                 newCookie.setPath("/");
                 response.addCookie(newCookie);
+//                productService.incrementViewCount(productId);
+            }
+
+            if(isNewViewCount) {
                 productService.incrementViewCount(productId);
             }
 
