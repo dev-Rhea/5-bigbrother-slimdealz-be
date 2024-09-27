@@ -41,6 +41,7 @@ public enum CustomErrorCode {
     //product error
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCT-001", "상품을 찾을 수 없습니다."),
     INVALID_PRODUCT_ID(HttpStatus.BAD_REQUEST, "PRODUCT-002", "상품이 유효하지 않습니다."),
+    INVALID_PRODUCT_NAME(HttpStatus.BAD_REQUEST, "PRODUCT-012", "상품명이 유효하지 않습니다."),
     PRODUCT_URL_INVALID(HttpStatus.BAD_REQUEST, "PRODUCT-003", "판매처 URL이 유효하지 않습니다."),
     PRODUCT_URL_REDIRECTION_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "PRODUCT-004", "판매처로의 리다이렉션에 실패했습니다."),
     PRODUCT_URL_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCT-005", "판매처 URL을 찾을 수 없습니다."),

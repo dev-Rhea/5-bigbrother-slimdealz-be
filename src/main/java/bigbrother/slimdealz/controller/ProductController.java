@@ -7,6 +7,9 @@ import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.service.ProductService;
 import bigbrother.slimdealz.service.S3Service;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +29,14 @@ public class ProductController {
     @GetMapping("/search")
     public List<ProductDto> searchProducts(@RequestParam("keyword") String keyword,
                                            @RequestParam(value = "lastSeenId", required = false) Long lastSeenId,
+                                           @RequestParam(value = "lastSeenProductName", required = false) String lastSeenProductName,
                                            @RequestParam(value = "size", defaultValue = "10") int size) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CompletableFuture<List<ProductDto>> future = CompletableFuture.supplyAsync(() -> {
             try {
-                List<ProductDto> products = productService.searchProducts(keyword, lastSeenId, size);
+                List<ProductDto> products = productService.searchProducts(keyword, lastSeenId, lastSeenProductName ,size);
                 products.forEach(product -> {
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     product.setImageUrl(imageUrl);
                 });
                 return products;
@@ -64,7 +68,7 @@ public class ProductController {
             List<ProductDto> products = productService.findLowestPriceProducts();
 
             products.forEach(product -> {
-                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                 product.setImageUrl(imageUrl);
             });
             return products;
@@ -78,9 +82,40 @@ public class ProductController {
     }
 
     @GetMapping("/product-detail")
-    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName) {
+    public ProductDto getProductWithLowestPriceByName(@RequestParam("productName") String productName,
+                                                      @RequestParam("productId") Long productId,
+                                                      HttpServletRequest request,
+                                                      HttpServletResponse response) {
         try {
             ProductDto productDto = productService.getProductWithLowestPriceByName(productName);
+
+            Cookie[] cookies = request.getCookies();
+            Cookie oldCookie = findCookie(cookies, "view_count");
+
+            boolean isNewViewCount = true;
+
+            if(oldCookie != null) {
+                if(oldCookie.getValue().contains("[" + productId + "]")) {
+                    isNewViewCount = false;
+                    // 조회수 증가
+//                    productService.incrementViewCount(productId);
+                }
+                else {
+                    oldCookie.setValue(oldCookie.getValue() + "[" + productId + "]");
+                    oldCookie.setPath("/");
+                    response.addCookie(oldCookie);
+                }
+            }
+            else {
+                Cookie newCookie = new Cookie("view_count", "[" + productId + "]");
+                newCookie.setPath("/");
+                response.addCookie(newCookie);
+//                productService.incrementViewCount(productId);
+            }
+
+            if(isNewViewCount) {
+                productService.incrementViewCount(productId);
+            }
 
             String imageUrl = s3Service.getProductImageUrl(productName);
             productDto.setImageUrl(imageUrl);
@@ -96,15 +131,27 @@ public class ProductController {
         }
     }
 
+    private Cookie findCookie(Cookie[] cookies, String name) {
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals(name)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
     @GetMapping("/products")
     public List<ProductDto> findByCategory(@RequestParam("category") String category,
                                            @RequestParam(value = "lastSeenId", required = false) Long lastSeenId,
+                                           @RequestParam(value = "lastSeenProductName", required = false) String lastSeenProductName,
                                            @RequestParam(value = "size", defaultValue = "10") int size) {
         try {
-            List<ProductDto> products = productService.findByCategory(category, lastSeenId, size);
+            List<ProductDto> products = productService.findByCategory(category, lastSeenId, lastSeenProductName, size);
 
             products.forEach(product -> {
-                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                 product.setImageUrl(imageUrl);
             });
             return products;
@@ -137,11 +184,32 @@ public class ProductController {
         try {
             List<ProductDto> products = productService.findRandomProducts();
             products.forEach(product -> {
-                String imageUrl = s3Service.getProductImageUrl(product.getName());
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                 product.setImageUrl(imageUrl);
             });
             return products;
 
+        } catch (CustomException e) {
+            log.error(e.getDetailMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/popular-products")
+    public List<ProductDto> findPopularProducts() {
+        try {
+
+            List<ProductDto> products = productService.getPopularProducts();
+
+            products.forEach(product -> {
+                String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                product.setImageUrl(imageUrl);
+            });
+
+            return products;
         } catch (CustomException e) {
             log.error(e.getDetailMessage());
             throw e;

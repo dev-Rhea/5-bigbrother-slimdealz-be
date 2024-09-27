@@ -11,13 +11,11 @@ import bigbrother.slimdealz.repository.Product.PriceHistoryRepository;
 import bigbrother.slimdealz.repository.Product.ProductRepository;
 import bigbrother.slimdealz.repository.Product.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +29,12 @@ public class ProductService {
 
     // 상품 검색
     @Transactional
-    public List<ProductDto> searchProducts(String keyword, Long lastSeenId, int size) {
-        List<ProductDto> products = productRepository.searchByKeyword(keyword, lastSeenId, size)
+    public List<ProductDto> searchProducts(String keyword, Long lastSeenId, String lastSeenProductName, int size) {
+        List<ProductDto> products = productRepository.searchByKeyword(keyword, lastSeenId, lastSeenProductName, size)
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 }) //converter 를 통해 DTO 로 변환
@@ -55,7 +53,7 @@ public class ProductService {
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 })
@@ -79,20 +77,29 @@ public class ProductService {
         ProductDto productDto = ProductConverter.toProductDTO(product);
 
         String imageUrl = s3Service.getProductImageUrl(productName);
-
         productDto.setImageUrl(imageUrl);
 
         return productDto;
     }
 
+    // 상품 조회수 증가
+    @Transactional
+    public void incrementViewCount(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND));
+
+        product.incrementViewCount();
+        productRepository.save(product);
+    }
+
     // 카테고리 별 상품 조회
     @Transactional
-    public List<ProductDto> findByCategory(String category, Long lastSeenId, int size) {
-        List<ProductDto> products = productRepository.findByCategory(category, lastSeenId, size)
+    public List<ProductDto> findByCategory(String category, Long lastSeenId, String lastSeenProductName, int size) {
+        List<ProductDto> products = productRepository.findByCategory(category, lastSeenId, lastSeenProductName, size)
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 })
@@ -121,7 +128,7 @@ public class ProductService {
                 .stream()
                 .map(product -> {
                     ProductDto productDto = ProductConverter.toProductDTO(product);
-                    String imageUrl = s3Service.getProductImageUrl(product.getName());
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
                     productDto.setImageUrl(imageUrl);
                     return productDto;
                 })
@@ -133,6 +140,7 @@ public class ProductService {
         return products;
     }
 
+    // 가격 비교 차트
     @Transactional
     public List<ChartDto> getChartData(String productName, String dateLimit) {
         LocalDateTime startDateTime;
@@ -150,6 +158,77 @@ public class ProductService {
         return priceHistoryRepository.findChartData(productName, startDateTime);
     }
 
+    @Scheduled(cron = "0 0 * * * ?")
+    @Transactional
+    public void updatePopularProducts() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+
+        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo)
+                .stream()
+                .map(product -> {
+                    ProductDto productDto = ProductConverter.toProductDTO(product);
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                    productDto.setImageUrl(imageUrl);
+                    return productDto;
+                })
+                .collect(Collectors.toList());
+
+        if (popularProducts.isEmpty()) {
+            popularProducts = productRepository.findTopProductsByPrice()
+                    .stream()
+                    .map(product -> {
+                        ProductDto productDto = ProductConverter.toProductDTO(product);
+                        String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                        productDto.setImageUrl(imageUrl);
+                        return productDto;
+                    })
+                    .toList();
+        }
+
+        // 점수 업데이트
+        for(ProductDto p : popularProducts) {
+            Product product = productRepository.findById(p.getId())
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND));
+
+            int delta = popularProducts.stream().anyMatch(productDto -> productDto.getId().equals(product.getId())) ? -1 : 1;
+            product.adjustScore(delta);
+            productRepository.save(product);
+        }
+
+        System.out.println("인기 급상승 상품이 업데이트 되었습니다.");
+    }
+
+    @Transactional
+    public List<ProductDto> getPopularProducts() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+
+        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo)
+                .stream()
+                .map(product -> {
+                    ProductDto productDto = ProductConverter.toProductDTO(product);
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                    productDto.setImageUrl(imageUrl);
+                    return productDto;
+                })
+                .collect(Collectors.toList());
+
+        if (popularProducts.isEmpty()) {
+            popularProducts = productRepository.findTopProductsByPrice()
+                    .stream()
+                    .map(product -> {
+                        ProductDto productDto = ProductConverter.toProductDTO(product);
+                        String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                        productDto.setImageUrl(imageUrl);
+                        return productDto;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return popularProducts;
+    }
+
+}
+
     public List<ReviewDto> getReview(String productName) {
 
         List<ReviewDto> reviewDtosByProductName = reviewRepository.findReviewDtosByProductName(productName);
@@ -160,3 +239,4 @@ public class ProductService {
         return reviewDtosByProductName;
     }
 }
+
