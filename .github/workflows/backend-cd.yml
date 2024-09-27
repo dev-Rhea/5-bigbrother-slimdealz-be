@@ -31,7 +31,7 @@ jobs:
 
       # Step to create the .env file
       - name: .env 파일 생성
-        run: echo "${{ secrets.SECRET_PROPERTIES }}" > .env
+        run: echo "${{ secrets.DEV_SECRET_PROPERTIES }}" > .env
 
       - name: Gradle 을 통해 빌드
         run: |
