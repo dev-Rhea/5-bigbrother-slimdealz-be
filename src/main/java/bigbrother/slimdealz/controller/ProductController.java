@@ -2,6 +2,7 @@ package bigbrother.slimdealz.controller;
 
 import bigbrother.slimdealz.dto.product.ChartDto;
 import bigbrother.slimdealz.dto.product.ProductDto;
+import bigbrother.slimdealz.dto.product.ReviewDto;
 import bigbrother.slimdealz.exception.CustomErrorCode;
 import bigbrother.slimdealz.exception.CustomException;
 import bigbrother.slimdealz.service.ProductService;
@@ -63,7 +64,7 @@ public class ProductController {
 
     @GetMapping("/today-lowest-products")
     public List<ProductDto> findLowestPriceProducts() {
-        try{
+        try {
             List<ProductDto> products = productService.findLowestPriceProducts();
 
             products.forEach(product -> {
@@ -71,12 +72,10 @@ public class ProductController {
                 product.setImageUrl(imageUrl);
             });
             return products;
-        }
-        catch (CustomException e) {
+        } catch (CustomException e) {
             log.error(e.getDetailMessage());
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
         }
@@ -224,8 +223,8 @@ public class ProductController {
     public List<ChartDto> getChartData(
             @RequestParam("productName") String productName,
             @RequestParam("dateLimit") String dateLimit
-    ){
-        try{
+    ) {
+        try {
             List<ChartDto> chart = productService.getChartData(productName, dateLimit);
             return chart;
         } catch (CustomException e) {
@@ -236,4 +235,19 @@ public class ProductController {
             throw new CustomException(CustomErrorCode.PRODUCT_NOT_FOUND);
         }
     }
+
+    @GetMapping("/review")
+    public List<ReviewDto> getReviews(@RequestParam("productName") String productName) {
+        try {
+            List<ReviewDto> reviews = productService.getReview(productName);
+            return reviews;
+        } catch (CustomException e) {
+            log.error(e.getDetailMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new CustomException(CustomErrorCode.REVIEW_NOT_FOUND);
+        }
+    }
+
 }
