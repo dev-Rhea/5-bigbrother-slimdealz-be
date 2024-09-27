@@ -155,16 +155,31 @@ public class ProductService {
         return priceHistoryRepository.findChartData(productName, startDateTime);
     }
 
-    // 인기 급상승 상품 갱신
     @Scheduled(cron = "0 0 * * * ?")
     @Transactional
     public void updatePopularProducts() {
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
 
-        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo);
+        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo)
+                .stream()
+                .map(product -> {
+                    ProductDto productDto = ProductConverter.toProductDTO(product);
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                    productDto.setImageUrl(imageUrl);
+                    return productDto;
+                })
+                .collect(Collectors.toList());
 
         if (popularProducts.isEmpty()) {
-            popularProducts = productRepository.findTopProductsByPrice();
+            popularProducts = productRepository.findTopProductsByPrice()
+                    .stream()
+                    .map(product -> {
+                        ProductDto productDto = ProductConverter.toProductDTO(product);
+                        String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                        productDto.setImageUrl(imageUrl);
+                        return productDto;
+                    })
+                    .toList();
         }
 
         // 점수 업데이트
@@ -176,20 +191,37 @@ public class ProductService {
             product.adjustScore(delta);
             productRepository.save(product);
         }
+
         System.out.println("인기 급상승 상품이 업데이트 되었습니다.");
     }
 
-    // 인기 급상승 상품 조회
     @Transactional
     public List<ProductDto> getPopularProducts() {
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
 
-        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo);
+        List<ProductDto> popularProducts = productRepository.findPopularProducts(oneHourAgo)
+                .stream()
+                .map(product -> {
+                    ProductDto productDto = ProductConverter.toProductDTO(product);
+                    String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                    productDto.setImageUrl(imageUrl);
+                    return productDto;
+                })
+                .collect(Collectors.toList());
 
-        if(popularProducts.isEmpty()) {
-            popularProducts = productRepository.findTopProductsByPrice();
+        if (popularProducts.isEmpty()) {
+            popularProducts = productRepository.findTopProductsByPrice()
+                    .stream()
+                    .map(product -> {
+                        ProductDto productDto = ProductConverter.toProductDTO(product);
+                        String imageUrl = s3Service.getProductImageUrl(product.getProductName());
+                        productDto.setImageUrl(imageUrl);
+                        return productDto;
+                    })
+                    .collect(Collectors.toList());
         }
 
         return popularProducts;
     }
+
 }

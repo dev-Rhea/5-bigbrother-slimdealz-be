@@ -1,6 +1,5 @@
 package bigbrother.slimdealz.entity.product;
 
-import bigbrother.slimdealz.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

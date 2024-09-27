@@ -29,6 +29,10 @@ public class S3Service {
 
     // 상품명과 일치하는 이미지 파일 찾기
     public String findImageName(String productName) {
+        if(productName == null || productName.isEmpty()) {
+            throw new CustomException(CustomErrorCode.INVALID_PRODUCT_NAME);
+        }
+
         ObjectListing objectListing = amazonS3.listObjects(bucket);
         List<S3ObjectSummary> objectSummaries = objectListing.getObjectSummaries();
 
