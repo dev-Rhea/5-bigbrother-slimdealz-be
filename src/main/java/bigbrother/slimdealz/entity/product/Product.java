@@ -32,6 +32,9 @@ public class Product extends BaseEntity {
     @Column(name = "vendor_url", nullable = false)
     private String vendorUrl;
 
+    @Column(name = "product_rating")
+    private double productRating;
+
     @Setter
     @Column(name = "view_count")
     private int viewCount;

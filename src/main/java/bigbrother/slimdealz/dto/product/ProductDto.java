@@ -20,6 +20,7 @@ public class ProductDto {
     private String shippingFee;
     private String vendorUrl;
     private String imageUrl;
+    private double productRating;
     private int viewCount;
     private Integer score;
     private LocalDateTime viewedAt;
