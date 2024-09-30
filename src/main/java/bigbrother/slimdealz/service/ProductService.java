@@ -227,8 +227,6 @@ public class ProductService {
         return popularProducts;
     }
 
-}
-
     public List<ReviewDto> getReview(String productName) {
 
         List<ReviewDto> reviewDtosByProductName = reviewRepository.findReviewDtosByProductName(productName);
@@ -238,5 +236,7 @@ public class ProductService {
         }
         return reviewDtosByProductName;
     }
+
 }
+
 
