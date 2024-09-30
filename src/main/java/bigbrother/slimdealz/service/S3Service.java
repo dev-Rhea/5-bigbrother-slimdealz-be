@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 @Slf4j
@@ -29,18 +31,35 @@ public class S3Service {
 
     // 상품명과 일치하는 이미지 파일 찾기
     public String findImageName(String productName) {
-        if(productName == null || productName.isEmpty()) {
-            throw new CustomException(CustomErrorCode.INVALID_PRODUCT_NAME);
+
+        try {
+            // productName만 UTF-8로 인코딩
+            String reProductName = URLEncoder.encode(productName, "UTF-8");
+            // 인코딩된 productName을 포함한 URL 반환
+            return "https://s3.ap-northeast-2.amazonaws.com/ktbbigbrother3/img/" + reProductName + ".jpg";
+        } catch (UnsupportedEncodingException e) {
+            // 인코딩 오류 처리
+            e.printStackTrace();
+            return null;
         }
 
-        ObjectListing objectListing = amazonS3.listObjects(bucket);
-        List<S3ObjectSummary> objectSummaries = objectListing.getObjectSummaries();
+//
+//        if(productName == null || productName.isEmpty()) {
+//            throw new CustomException(CustomErrorCode.INVALID_PRODUCT_NAME);
+//        }
+//
+//        ObjectListing objectListing = amazonS3.listObjects(bucket);
+//        List<S3ObjectSummary> objectSummaries = objectListing.getObjectSummaries();
+//
+//        return objectSummaries.stream()
+//                .map(S3ObjectSummary::getKey)
+//                .filter(key -> key.contains(productName))
+//                .findFirst()
+//                .orElseThrow(() -> new CustomException(
+//                        CustomErrorCode.PRODUCT_IMAGE_NOT_FOUND,
+//                        "Product image not found for: " + productName
+//                ));
 
-        return objectSummaries.stream()
-                .map(S3ObjectSummary::getKey)
-                .filter(key -> key.contains(productName))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(CustomErrorCode.PRODUCT_IMAGE_NOT_FOUND));
     }
 
     // 이미지 파일 URL 반환
@@ -49,8 +68,18 @@ public class S3Service {
     }
 
     public String getProductImageUrl (String productName) {
-        String fileName = findImageName(productName);
+//        String fileName = findImageName(productName);
 
-        return getImageUrl(fileName);
+        try {
+            // productName만 UTF-8로 인코딩
+            String reProductName = URLEncoder.encode(productName, "UTF-8");
+            // 인코딩된 productName을 포함한 URL 반환
+            return "https://s3.ap-northeast-2.amazonaws.com/ktbbigbrother3/img/" + reProductName + ".jpg";
+        } catch (UnsupportedEncodingException e) {
+            // 인코딩 오류 처리9
+            e.printStackTrace();
+            return null;
+        }
+//        return getImageUrl(fileName);
     }
 }
