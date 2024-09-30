@@ -227,7 +227,6 @@ public class ProductService {
         return popularProducts;
     }
 
-}
 
     public List<ReviewDto> getReview(String productName) {
 
