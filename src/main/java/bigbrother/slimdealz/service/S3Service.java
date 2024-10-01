@@ -57,6 +57,7 @@ public class S3Service {
     }
 
     public String getProductImageUrl (String productName) {
+        //원복 필요시 주석처리된 코드들을 해제하고, 아래의 try-catch구문을 주석처리할 것
 //        String fileName = findImageName(productName);
 
         try {
