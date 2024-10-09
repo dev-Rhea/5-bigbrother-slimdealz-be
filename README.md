@@ -23,17 +23,22 @@
 <table>
 <tbody>
 <tr>
-<td align="center"><a href="https://github.com/lky3004me"><br /> ![이강윤_C](https://github.com/user-attachments/assets/d932a914-f648-431d-ae7b-95e95f17bca1)
+<td align="center"><a href="https://github.com/lky3004me"><br /> <img width="211" alt="스크린샷 2024-10-10 오전 12 57 49" src="https://github.com/user-attachments/assets/1c36d0a1-53f9-4bca-9594-769b214f6ed5">
+
  <sub><b>BE 팀장: kevin.lee(이강윤)</b></sub></a><br /></td>
-<td align="center"><a href="https://github.com/lucy726j"><br />![조의연_C](https://github.com/user-attachments/assets/b9e55963-455a-4322-9171-4ccec12a8301)
+<td align="center"><a href="https://github.com/lucy726j"><br /><img width="208" alt="스크린샷 2024-10-10 오전 12 58 01" src="https://github.com/user-attachments/assets/b0dea7b0-3de1-46a6-b207-35b12617c522">
+
   <sub><b>FE 팀원: lily.jo(조의연)</b></sub></a><br /></td>
 </tr>
 <tr>
-<td align="center"><a href="https://github.com/bysoyeon"><br /> <img width="127" alt="스크린샷 2024-10-10 오전 12 53 55" src="https://github.com/user-attachments/assets/29426aab-fab1-4089-ab7a-40c2221bd274">
+<td align="center"><a href="https://github.com/bysoyeon"><br /> <img width="208" alt="스크린샷 2024-10-10 오전 12 58 07" src="https://github.com/user-attachments/assets/1d738aef-4efe-4f31-9648-cf32f1c5101d">
+
  <sub><b>DevOps 팀원: derek.yoo(유문호)</b></sub></a><br /></td>
-<td align="center"><a href="https://github.com/lky3004me"><br /> ![Untitled](https://github.com/user-attachments/assets/5081e9e5-a472-4e7d-adbb-826044b5513e)
+<td align="center"><a href="https://github.com/lky3004me"><br /> <img width="210" alt="스크린샷 2024-10-10 오전 12 58 37" src="https://github.com/user-attachments/assets/12beee15-56d8-48b4-a717-a0bab6028e9e">
+
  <sub><b>BE 팀원: danny.cho(조용원)</b></sub></a><br /></td>
-<td align="center"><a href="https://github.com/grulla79"><br /> <img width="125" alt="스크린샷 2024-10-10 오전 12 54 02" src="https://github.com/user-attachments/assets/d6b6e412-26c9-440a-8478-ec600814ef4c">
+<td align="center"><a href="https://github.com/grulla79"><br /> <img width="206" alt="스크린샷 2024-10-10 오전 12 58 28" src="https://github.com/user-attachments/assets/58a823d2-06dc-492f-a1a2-79baf5ac2497">
+
  <sub><b>BE 팀원: rhea.chu(추연수)</b></sub></a><br /></td>
 </tr>
 </tbody>
