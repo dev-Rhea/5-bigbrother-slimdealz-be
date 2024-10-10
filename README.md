@@ -11,7 +11,7 @@
 - **FE**: React, Vie js, Babel js, Typescript
 - **BE**: Spring Boot, JPA
 - **DB**: AWS RDS MySQL
-- **SCRAPPING&CROLLING:** Python, BeuatifulSoup4, Selenium ****
+- **SCRAPPING&CROLLING:** Python, BeuatifulSoup4, Selenium
 - 배포: Docker, AWS
 
 ### 팀 소개
