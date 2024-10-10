@@ -11,7 +11,7 @@
 - **FE**: React, Vie js, Babel js, Typescript
 - **BE**: Spring Boot, JPA
 - **DB**: AWS RDS MySQL
-- **SCRAPPING&CROLLING:** Python, BeuatifulSoup4, Selenium ****
+- **SCRAPPING&CROLLING:** Python, BeuatifulSoup4, Selenium
 - 배포: Docker, AWS
 
 ### 팀 소개
@@ -77,6 +77,7 @@
     - **인기 많은 제품/ 북마크 맞춤 추천 기능**: 향후 확장 시 사용자의 건강 목표나 취향에 따라 맞춤형 건강식품 추천.
     - **리뷰 및 평점 시스템**: 사용자가 구매한 닭가슴살에 대한 리뷰를 남기고 평가할 수 있는 기능, 추후 건강식품 카테고리 확장.
 5. **서비스 시스템 아키텍쳐**<br/>
+![Gray Peach Purple Green Modern Product Launch Plan Presentation (2)](https://github.com/user-attachments/assets/0e5da335-c410-4283-9872-7f9fbc05e805)
 
 6. **기대 효과**
     - 사용자들이 닭가슴살을 최저가로 구매하여 비용을 절감할 수 있음.
