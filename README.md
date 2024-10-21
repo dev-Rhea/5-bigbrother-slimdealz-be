@@ -90,4 +90,4 @@
 
 ### 발표 자료 링크
 
-[발표 자료 링크](https://www.canva.com/design/DAGNDa1-m9U/M8CdlGe54FRHH5cu7OJjLQ/view?utm_content=DAGNDa1-m9U&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+[발표 자료 링크](https://www.canva.com/design/DAGSUA7LySg/UoBXtfP0Dn3uZukxFz1Y1g/view?utm_content=DAGSUA7LySg&utm_campaign=designshare&utm_medium=link&utm_source=editor)
