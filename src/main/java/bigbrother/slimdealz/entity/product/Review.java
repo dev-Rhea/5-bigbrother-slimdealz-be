@@ -11,21 +11,21 @@ import lombok.*;
 public class Review extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-
-    @Column(name = "product_name", nullable = false)
-    String productName;
+    private Long id;
 
     @Column(name = "customer_rating", nullable = false)
-    int customerRating;
+    private int customerRating;
 
     @Column(name = "content", nullable = false)
-    String content;
+    private String content;
 
     @Column(name = "product_source", nullable = false)
-    String productSource;
+    private String productSource;
 
     @Column(name = "user_name", nullable = false)
-    String userName;
+    private String userName;
 
+    @JoinColumn(name = "product_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product product;
 }
