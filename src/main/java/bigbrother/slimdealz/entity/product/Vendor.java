@@ -1,6 +1,6 @@
 package bigbrother.slimdealz.entity.product;
 
-import bigbrother.slimdealz.entity.BaseEntity;
+import bigbrother.slimdealz.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Vendor extends BaseEntity {
+public class Vendor extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +21,4 @@ public class Vendor extends BaseEntity {
 
     @Column(name = "vendor_url")
     private String vendorUrl;
-
-    @OneToMany(mappedBy = "vendor", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Price> prices;
-
 }

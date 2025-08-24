@@ -1,16 +1,19 @@
 package bigbrother.slimdealz.dto.product;
 
-import lombok.AllArgsConstructor;
+import bigbrother.slimdealz.entity.product.Vendor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class VendorDto {
-    Long id;
-    String vendorName;
-    String vendorUrl;
+public record VendorDto (
+    Long vendorId,
+    String vendorName,
+    String vendorUrl
+) {
+    public static VendorDto from(Vendor vendor) {
+        return VendorDto.builder()
+                .vendorId(vendor.getId())
+                .vendorName(vendor.getVendorName())
+                .vendorUrl(vendor.getVendorUrl())
+                .build();
+    }
 }
