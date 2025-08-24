@@ -1,6 +1,8 @@
 package bigbrother.slimdealz.entity.product;
 
+import bigbrother.slimdealz.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -8,23 +10,14 @@ import java.time.LocalDateTime;
 @Table(name = "price_history")  // 테이블 이름을 대소문자에 맞춰 사용
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PriceHistory {
+public class PriceHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_name", nullable = false)
-    private String productName;
-
     @Column(name = "previous_price", nullable = false)
     private int previousPrice;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;  // Instant에서 LocalDateTime으로 변경
-
-    @Column(name = "end_at")
-    private LocalDateTime endAt;  // Instant에서 LocalDateTime으로 변경
 
     @ManyToOne
     @JoinColumn(name = "price_id", nullable = false)
