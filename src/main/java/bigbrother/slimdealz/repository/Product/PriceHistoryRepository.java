@@ -14,12 +14,12 @@ import java.util.List;
 public interface PriceHistoryRepository extends JpaRepository<PriceHistory, Long> {
 
     // 이름으로 제품 검색
-    @Query("SELECT new bigbrother.slimdealz.dto.product.ChartDto(ph.productName, ph.previousPrice, ph.updatedAt) " +
+    @Query("SELECT ph.id " +
             "FROM PriceHistory ph " +
-            "WHERE ph.productName = :productName " +
+            "WHERE ph.price.product.id = :productId " +
             "AND ph.updatedAt >= :startDate " +
             "ORDER BY ph.updatedAt ASC")
-    List<ChartDto> findChartData(@Param("productName") String productName, @Param("startDate") LocalDateTime startDate);  // LocalDateTime으로 수정
+    List<ChartDto> findChartData(@Param("productId") Long productId, @Param("startDate") LocalDateTime startDate);
 
 
 }
