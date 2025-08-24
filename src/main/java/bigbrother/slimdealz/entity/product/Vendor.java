@@ -8,8 +8,6 @@ import java.util.List;
 
 @Table(name = "vendors")
 @Entity
-@Builder
-@AllArgsConstructor
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Vendor extends BaseEntity {

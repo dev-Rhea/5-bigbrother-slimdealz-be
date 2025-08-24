@@ -5,9 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "priceHistory")  // 테이블 이름을 대소문자에 맞춰 사용
-@Builder
-@AllArgsConstructor
+@Table(name = "price_history")  // 테이블 이름을 대소문자에 맞춰 사용
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PriceHistory {
@@ -29,6 +27,6 @@ public class PriceHistory {
     private LocalDateTime endAt;  // Instant에서 LocalDateTime으로 변경
 
     @ManyToOne
-    @JoinColumn(name = "price_id", nullable = false, foreignKey = @ForeignKey(name = "FK_PriceHistory_Price"))
+    @JoinColumn(name = "price_id", nullable = false)
     private Price price;
 }

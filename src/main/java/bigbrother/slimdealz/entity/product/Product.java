@@ -10,8 +10,6 @@ import java.util.List;
 
 @Table(name = "products")
 @Entity
-@Builder
-@AllArgsConstructor
 @Getter
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {

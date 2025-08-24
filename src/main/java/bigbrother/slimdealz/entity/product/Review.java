@@ -8,8 +8,6 @@ import java.time.LocalDate;
 
 @Table(name = "reviews")
 @Entity
-@Builder
-@AllArgsConstructor
 @Getter
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
