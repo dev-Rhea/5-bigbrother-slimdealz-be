@@ -33,7 +33,6 @@ public class Product extends BaseEntity {
     @Column(name = "product_rating")
     private double productRating;
 
-    @Setter
     @Column(name = "view_count")
     private int viewCount;
 
