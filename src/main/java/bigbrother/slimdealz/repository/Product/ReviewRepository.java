@@ -11,7 +11,6 @@ import java.util.List;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    @Query("SELECT new bigbrother.slimdealz.dto.product.ReviewDto(r.productName, r.customerRating, r.content, r.productSource, r.reviewDate, r.userName) " +
-            "FROM Review r WHERE r.productName = :productName")
-    List<ReviewDto> findReviewDtosByProductName(@Param("productName") String productName);
+    @Query("SELECT r.id FROM Review r WHERE r.product.id = :productId")
+    List<ReviewDto> findReviewsByproductId(@Param("productId") Long productId);
 }
