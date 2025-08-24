@@ -2,9 +2,7 @@ package bigbrother.slimdealz.entity.product;
 
 import bigbrother.slimdealz.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "price_history")  // 테이블 이름을 대소문자에 맞춰 사용

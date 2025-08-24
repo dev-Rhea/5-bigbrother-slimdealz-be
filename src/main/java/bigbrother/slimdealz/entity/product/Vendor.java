@@ -4,8 +4,6 @@ import bigbrother.slimdealz.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Table(name = "vendors")
 @Entity
 @Getter

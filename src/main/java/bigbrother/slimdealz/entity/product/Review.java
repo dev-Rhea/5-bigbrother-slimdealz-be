@@ -1,16 +1,14 @@
 package bigbrother.slimdealz.entity.product;
 
-import bigbrother.slimdealz.entity.BaseEntity;
+import bigbrother.slimdealz.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
 
 @Table(name = "reviews")
 @Entity
 @Getter
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
-public class Review extends BaseEntity {
+public class Review extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -26,9 +24,6 @@ public class Review extends BaseEntity {
 
     @Column(name = "product_source", nullable = false)
     String productSource;
-
-    @Column(name = "review_date", nullable = false)
-    LocalDate reviewDate;
 
     @Column(name = "user_name", nullable = false)
     String userName;

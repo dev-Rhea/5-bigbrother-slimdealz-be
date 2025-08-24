@@ -4,8 +4,6 @@ import bigbrother.slimdealz.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Table(name = "prices")
 @Entity
 @Builder
