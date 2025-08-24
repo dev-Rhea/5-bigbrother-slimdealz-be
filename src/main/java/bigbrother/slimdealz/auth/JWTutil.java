@@ -1,6 +1,5 @@
 package bigbrother.slimdealz.auth;
 
-import bigbrother.slimdealz.entity.MemberRole;
 import bigbrother.slimdealz.exception.CustomExpiredJwtException;
 import bigbrother.slimdealz.exception.CustomJwtException;
 import io.jsonwebtoken.ExpiredJwtException;
