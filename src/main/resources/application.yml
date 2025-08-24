@@ -5,6 +5,16 @@ spring:
   jwt:
     secret: ${JWT_SECRET_KEY}
 
+  batch:
+    job:
+      enabled: true
+      schedule:
+        product-cache-refresh: 0 0 4 * * * # 매일 새벽 4시에 실행
+
+  cache:
+    default-ttl: 900000 # 캐시 기본 만료 시간 (초 단위, 1일)
+    enable-monitoring: true
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
