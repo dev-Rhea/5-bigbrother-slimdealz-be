@@ -1,8 +1,8 @@
 package bigbrother.slimdealz.entity.product;
 
-
-import bigbrother.slimdealz.entity.BaseEntity;
+import bigbrother.slimdealz.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.util.stream.Collectors;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,11 +12,11 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
-public class Product extends BaseEntity {
+public class Product extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "product_name", nullable = false)
     private String productName;
@@ -24,20 +24,14 @@ public class Product extends BaseEntity {
     @Column(name = "product_category", nullable = false)
     private String category;
 
-    @Column(name = "shipping_price")
-    private String shippingFee;
-
-    @Column(name = "vendor_url", nullable = false)
-    private String vendorUrl;
+    @Column(name = "shipping_fee", nullable = false)
+    private int shippingFee;
 
     @Column(name = "product_rating")
     private double productRating;
 
     @Column(name = "view_count")
     private int viewCount;
-
-    @Column(name = "viewed_at")
-    private LocalDateTime viewedAt;
 
     @Column(name = "score")
     private Integer score;
@@ -48,7 +42,6 @@ public class Product extends BaseEntity {
     // 조회수 추가
     public void incrementViewCount() {
         this.viewCount++;
-        this.viewedAt = LocalDateTime.now();
     }
 
     // 점수 추가
@@ -57,5 +50,12 @@ public class Product extends BaseEntity {
             this.score = 0;
         }
         this.score += delta;
+    }
+
+    public List<Vendor> getVendors() {
+        return prices.stream()
+            .map(Price::getVendor)
+            .distinct()
+            .collect(Collectors.toList());
     }
 }
