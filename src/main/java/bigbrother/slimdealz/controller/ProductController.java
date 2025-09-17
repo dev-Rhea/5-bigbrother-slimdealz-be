@@ -50,10 +50,10 @@ public class ProductController {
         }, executor);
 
         try {
-            return future.get(3, TimeUnit.SECONDS);  // 10초 타임아웃 설정
+            return future.get(3, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             log.error("Search request timed out");
-            throw new CustomException(CustomErrorCode.SEARCH_TIMEOUT);  // 타임아웃에 대한 커스텀 에러
+            throw new CustomException(CustomErrorCode.SEARCH_TIMEOUT);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new CustomException(CustomErrorCode.SEARCH_NO_RESULT);
